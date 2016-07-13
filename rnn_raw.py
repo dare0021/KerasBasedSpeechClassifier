@@ -3,6 +3,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution1D, MaxPooling1D
 from keras.utils import np_utils
 
+import time
 import numpy as np
 import preprocessor as inp
 
@@ -15,7 +16,7 @@ nb_filters = 32
 # size of pooling area for max pooling
 nb_pool = 2
 # convolution kernel size
-nb_conv = 2
+nb_conv = 3
 
 batch_size = 128
 # number of possible classes. In this case, just 2 (TODO: should be 3 after adding noise)
@@ -41,11 +42,11 @@ Y_test = np_utils.to_categorical(y_test, nb_classes)
 
 model = Sequential()
 
-model.add(Convolution1D(nb_filters, nb_conv*8, 
+model.add(Convolution1D(nb_filters, nb_conv/3, 
                         border_mode='valid',
                         input_shape=(1, X_train.shape[2])))
 model.add(Activation('relu'))
-model.add(MaxPooling1D(pool_size=(nb_pool)))
+# model.add(MaxPooling1D(pool_length=nb_pool))
 model.add(Dropout(0.25))
 
 
