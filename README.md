@@ -5,6 +5,8 @@ Using Keras to build a classifier for speech. Not necessarily a speaker identifi
 Python 2.7
 
 numpy is required
+
+Wav files excluded from repo due to possible legal issues.
 ______________________________________________
 
 Contains 2 branches, neither finished:
