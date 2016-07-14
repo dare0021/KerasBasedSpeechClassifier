@@ -4,7 +4,7 @@ import overlappingSamples as oss
 from os import listdir
 from os.path import isfile, join
 
-reducedInput = True
+reducedInput = False
 
 
 # not the python int max, int max for the wav file
@@ -28,6 +28,8 @@ def generateFileList(rootPath):
 		print "WARN: not using all available input"
 		X_train_path = ["004_M3", "012_F2"]
 		y_train_data = [1, 0]
+	else:
+		global X_train_path, y_train_data
 
 	for p in X_train_path:
 		a = root + "/" + p + "/C" + p + "_INDE"
@@ -105,12 +107,12 @@ def run(frameSize, percentageThreshold):
 	fileCount = X_train_i.shape[0] + X_test_i.shape[0]
 
 	print "importing files... Total count: " + str(fileCount)
-	X_train = oss.thirdsWithAThirdUnique(readFile(X_train_i[0], framesPerItem))
+	X_train = oss.run(readFile(X_train_i[0], framesPerItem))
 	y_train = np.full((X_train.shape[0]), y_train_i[0], dtype='int8')
 	inum = 1
 	processedCount = 1
 	for i in X_train_i[1:]:
-		iter = oss.thirdsWithAThirdUnique(readFile(i, framesPerItem))
+		iter = oss.run(readFile(i, framesPerItem))
 		X_train = np.append(X_train, iter, axis=0)
 		y_train = np.append(y_train, np.full((iter.shape[0]), y_train_i[inum], dtype='int8'))
 		inum += 1
@@ -118,11 +120,11 @@ def run(frameSize, percentageThreshold):
 		if processedCount % 100 == 0:
 			print "importing files: " + str(processedCount) + " / " + str(fileCount)
 
-	X_test = oss.thirdsWithAThirdUnique(readFile(X_test_i[0], framesPerItem))
+	X_test = oss.run(readFile(X_test_i[0], framesPerItem))
 	y_test = np.full((X_test.shape[0]), y_test_i[0], dtype='int8')
 	inum = 1
 	for i in X_test_i[1:]:
-		iter = oss.thirdsWithAThirdUnique(readFile(i, framesPerItem))
+		iter = oss.run(readFile(i, framesPerItem))
 		X_test = np.append(X_test, iter, axis=0)
 		y_test = np.append(y_test, np.full((iter.shape[0]), y_test_i[inum], dtype='int8'))
 		inum += 1
@@ -136,8 +138,8 @@ def run(frameSize, percentageThreshold):
 	shuffleTwoArrs(X_train, y_train)
 	shuffleTwoArrs(X_test, y_test)
 
-	X_train = X_train.reshape(X_train.shape[0], 1, framesPerItem)
-	X_test = X_test.reshape(X_test.shape[0], 1, framesPerItem)
+	X_train = X_train.reshape(X_train.shape[0], 1, framesPerItem, 1)
+	X_test = X_test.reshape(X_test.shape[0], 1, framesPerItem, 1)
 
 	return ((X_train, y_train), (X_test, y_test))
 

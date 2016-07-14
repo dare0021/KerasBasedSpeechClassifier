@@ -15,9 +15,34 @@ def thirdsWithAThirdUnique(sequence):
 	sequence = sequence.flatten()
 	for i in range(1, lt):
 		nextCursor = cursor + lf - l3
-		if nextCursor >= np.size(sequence):
+		if nextCursor + l3 > np.size(sequence):
 			out[i] = np.append(sequence[cursor:], np.zeros(shape=(lf - np.size(sequence[cursor:]))))
 			break
 		out[i] = sequence[cursor : cursor + lf]
 		cursor = nextCursor
 	return out
+
+# Example:
+# in: 0-30 30-60 ..
+# out: 0-30 10-40 20-50 ...
+def progressByThirds(sequence):
+	l3 = sequence.shape[1] // 3
+	lf = sequence.shape[1]
+	lt = (int)(((float)(sequence.shape[0]) - 1/3) * 3/2)
+	out = np.zeros(shape=(lt,lf))
+	out[0] = sequence[0]
+	cursor = l3
+	sequence = sequence.flatten()
+	for i in range(1, lt):
+		nextCursor = cursor + l3
+		if nextCursor + l3 > np.size(sequence):
+			out[i] = np.append(sequence[cursor:], np.zeros(shape=(lf - np.size(sequence[cursor:]))))
+			break
+		out[i] = sequence[cursor : cursor + lf]
+		cursor = nextCursor
+	return out
+
+def run(sequence):
+	# return thirdsWithAThirdUnique(sequence)
+	return progressByThirds(sequence)
+	# return sequence
