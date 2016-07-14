@@ -65,7 +65,7 @@ start = time.clock()
 model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
           verbose=0, validation_data=(X_test, Y_test))
 score = model.evaluate(X_test, Y_test, verbose=0)
-print(time.clock() - start)
+print('Time taken:', time.clock() - start)
 print('Test score:', score[0])
 print('Test accuracy:', score[1])
 

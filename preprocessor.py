@@ -1,18 +1,52 @@
 import numpy as np
 import wavOpener as wo
 import overlappingSamples as oss
+from os import listdir
+from os.path import isfile, join
+
+reducedInput = True
 
 
 # not the python int max, int max for the wav file
 # note we're ignoring that INT_MIN is (INT_MAX*-1)-1
 INT_MAX = 2147483647
 
-X_train_path = ["wavs/f2-1.wav", "wavs/f2-3.wav", "wavs/f2-5.wav", 
-				"wavs/m3-4.wav", "wavs/m3-8.wav", "wavs/m3-10.wav"]
-y_train_data = [0, 0, 0, 1, 1, 1]
-X_test_path = ["wavs/m3-12.wav", "wavs/f2-7.wav"]
+root = "../SPK_DB"
+X_train_path = ["001_M3", "002_M4", "003_M3", "004_M3", "012_F2", "013_F3", "014_F2", "015_F3"]
+y_train_data = [1, 1, 1, 1, 0, 0, 0, 0]
+X_test_path = ["005_M4", "011_F3"]
 y_test_data = [1, 0]
 
+def generateFileList(rootPath):
+	iterNum = 0
+	X_train_i = np.array([])
+	X_test_i = np.array([])
+	y_train_i = np.array([])
+	y_test_i = np.array([])
+
+	if reducedInput:
+		print "WARN: not using all available input"
+		X_train_path = ["004_M3", "012_F2"]
+		y_train_data = [1, 0]
+
+	for p in X_train_path:
+		a = root + "/" + p + "/C" + p + "_INDE"
+		b = root + "/" + p + "/C" + p + "_SENT"
+		filesThisFolder = np.append([a + "/" + f for f in listdir(a) if isfile(join(a, f)) and f.endswith(".wav")],
+									[b + "/" + f for f in listdir(b) if isfile(join(b, f)) and f.endswith(".wav")])
+		y_train_i = np.append(y_train_i, np.full((filesThisFolder.shape[0]), y_train_data[iterNum], dtype='int8'))
+		X_train_i = np.append(X_train_i, filesThisFolder)
+		iterNum += 1
+	iterNum = 0
+	for p in X_test_path:
+		a = root + "/" + p + "/C" + p + "_INDE"
+		b = root + "/" + p + "/C" + p + "_SENT"
+		filesThisFolder = np.append([a + "/" + f for f in listdir(a) if isfile(join(a, f)) and f.endswith(".wav")],
+									[b + "/" + f for f in listdir(b) if isfile(join(b, f)) and f.endswith(".wav")])
+		y_test_i = np.append(y_test_i, np.full((filesThisFolder.shape[0]), y_test_data[iterNum], dtype='int8'))
+		X_test_i = np.append(X_test_i, filesThisFolder)
+		iterNum += 1
+	return ((X_train_i, y_train_i), (X_test_i, y_test_i))
 
 def readFile(input, framesPerItem):
 	if not wo.open(input):
@@ -31,15 +65,12 @@ def getFramerate(input):
 		sys.exit()
 	return wo.getFramerate()
 
-def fpschk():
+def fpschk(files):
 	fps = -1
-	for i in X_train_path:
+	for i in files:
 		if fps == -1:
 			fps = getFramerate(i)
 		elif fps != getFramerate(i):
-			sys.exit()
-	for i in X_test_path:
-		if fps != getFramerate(i):
 			sys.exit()
 	print "FPS OK"
 	print "FPS: ", fps
@@ -67,26 +98,37 @@ def shuffleTwoArrs(x, y):
     np.random.shuffle(y)
 
 def run(frameSize, percentageThreshold):
-	fps = fpschk()
+	((X_train_i, y_train_i), (X_test_i, y_test_i)) = generateFileList(root)
+	fps = fpschk(np.append(X_train_i, X_test_i))
 	framesPerItem = fps * frameSize / 1000
 
-	X_train = oss.thirdsWithAThirdUnique(readFile(X_train_path[0], framesPerItem))
-	y_train = np.full((X_train.shape[0]), y_train_data[0], dtype='int8')
+	fileCount = X_train_i.shape[0] + X_test_i.shape[0]
+
+	print "importing files... Total count: " + str(fileCount)
+	X_train = oss.thirdsWithAThirdUnique(readFile(X_train_i[0], framesPerItem))
+	y_train = np.full((X_train.shape[0]), y_train_i[0], dtype='int8')
 	inum = 1
-	for i in X_train_path[1:]:
+	processedCount = 1
+	for i in X_train_i[1:]:
 		iter = oss.thirdsWithAThirdUnique(readFile(i, framesPerItem))
 		X_train = np.append(X_train, iter, axis=0)
-		y_train = np.append(y_train, np.full((iter.shape[0]), y_train_data[inum], dtype='int8'))
+		y_train = np.append(y_train, np.full((iter.shape[0]), y_train_i[inum], dtype='int8'))
 		inum += 1
+		processedCount += 1
+		if processedCount % 100 == 0:
+			print "importing files: " + str(processedCount) + " / " + str(fileCount)
 
-	X_test = oss.thirdsWithAThirdUnique(readFile(X_test_path[0], framesPerItem))
-	y_test = np.full((X_test.shape[0]), y_test_data[0], dtype='int8')
+	X_test = oss.thirdsWithAThirdUnique(readFile(X_test_i[0], framesPerItem))
+	y_test = np.full((X_test.shape[0]), y_test_i[0], dtype='int8')
 	inum = 1
-	for i in X_test_path[1:]:
+	for i in X_test_i[1:]:
 		iter = oss.thirdsWithAThirdUnique(readFile(i, framesPerItem))
 		X_test = np.append(X_test, iter, axis=0)
-		y_test = np.append(y_test, np.full((iter.shape[0]), y_test_data[inum], dtype='int8'))
+		y_test = np.append(y_test, np.full((iter.shape[0]), y_test_i[inum], dtype='int8'))
 		inum += 1
+		processedCount += 1
+		if processedCount % 100 == 0:
+			print "importing files: " + str(processedCount) + " / " + str(fileCount)
 
 	(X_train, y_train) = removeZeroSamples(X_train, y_train, percentageThreshold = percentageThreshold)
 	(X_test, y_test) = removeZeroSamples(X_test, y_test, percentageThreshold = percentageThreshold)
@@ -98,3 +140,10 @@ def run(frameSize, percentageThreshold):
 	X_test = X_test.reshape(X_test.shape[0], 1, framesPerItem)
 
 	return ((X_train, y_train), (X_test, y_test))
+
+# for unit test
+# out = run(30, .7)
+# print out[0][0].shape
+# print out[0][1].shape
+# print out[1][0].shape
+# print out[1][1].shape
