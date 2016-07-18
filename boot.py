@@ -15,6 +15,9 @@ avgScore = -1
 avgAcc = -1
 # Uncomment the section to use
 for i in range(numIterations):
+	print "___________________________"
+	print "Starting iteration: ", i+1
+	print "___________________________"
 	# All .mfc files should be present in the directory given using the parameter "input"
 	score = rnn_mfcc.run(unpredictableSeed = useFreshRngSeeds)
 	# input is hard coded in to preprocessor.py
