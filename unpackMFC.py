@@ -10,3 +10,7 @@ def run(input):
 	for i in range(size):
 		out[i//13][i%13] = struct.unpack('>f', ''.join(file.read(4)))[0]
 	return out
+
+# feature vectors are sets of 13 per timestep
+# study recommends 60
+# test later
