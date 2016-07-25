@@ -71,7 +71,7 @@ def run(rootPath, testRatio = 0.1, percentageThreshold = 0.7, featureVectorSize 
 
 # for unit test
 # out = run("../SPK_DB/mfc13")
-# out = run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
+out = run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
 # print out[0][0].shape
 # print out[0][1].shape
 # print out[1][0].shape
