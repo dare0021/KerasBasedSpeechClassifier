@@ -7,48 +7,70 @@ import numpy as np
 import time
 import mfcPreprocessor as mfcpp
 
+# Ratio of tests vs input. Training set is (1 - this) of the input.
+ratioOfTestsInInput = 0.1
+# Cull samples which have <= this ratio of data points as non-zero values
+percentageThreshold = 0.7
+# number of convolutional filters to use
+nb_filters = 32
+# size of pooling area for max pooling
+nb_pool = 2
+# convolution kernel size
+filter_len = 3
+
+# number of samples before weight update
+batch_size = 128
+# number of possible classes. In this case, just 2 (TODO: should be 3 after adding noise)
+nb_classes = 2
+# how many iterations to run
+nb_epoch = 12
+
+X_set = None
+Y_set = None
+
+def shuffleTwoArrs(x, y):
+    rng_state = np.random.get_state()
+    np.random.shuffle(x)
+    np.random.set_state(rng_state)
+    np.random.shuffle(y)
+
 # input: Directory(ies) where the mfc files are in
-def run(input, unpredictableSeed = False, featureVectorSize = 13):
+def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13):
+	global X_set
+	global Y_set
+
 	# for reproducibility
 	if not unpredictableSeed:
-		np.random.seed(1337) 
-	else:
-		np.random.seed()
+		np.random.seed(1337)
 
-	# Ratio of tests vs input. Training set is (1 - this) of the input.
-	ratioOfTestsInInput = 0.1
-	# Cull samples which have <= this ratio of data points as non-zero values
-	percentageThreshold = 0.7
-	# number of convolutional filters to use
-	nb_filters = 32
-	# size of pooling area for max pooling
-	nb_pool = 2
-	# convolution kernel size
-	filter_len = 3
+	X_set, Y_set = mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
 
-	# number of samples before weight update
-	batch_size = 128
-	# number of possible classes. In this case, just 2 (TODO: should be 3 after adding noise)
-	nb_classes = 2
-	# how many iterations to run
-	nb_epoch = 12
+	print "Total size:", X_set.size
 
-	((X_train, y_train), (X_test, y_test)) = mfcpp.run(input, testRatio = ratioOfTestsInInput, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
+# X_train:	input for the training set
+# X_test:	input for the test set
+# y_train:	result for the training set
+# y_test:	result for the test set
+def getSubset(dropout):
+	global X_set
+	global Y_set
 
-	print X_train.shape, y_train.shape, X_test.shape, y_test.shape
-	print X_train.dtype, y_train.dtype, X_test.dtype, y_test.dtype
-
-	# X_train:	input for the training set
-	# X_test:	input for the test set
-	# y_train:	result for the training set
-	# y_test:	result for the test set
-
-	X_train = X_train.astype('float32')
-	X_test = X_test.astype('float32')
+	shuffleTwoArrs(X_set, Y_set)
+	
+	trainListSize = X_set.shape[0] // (1 / (1 - ratioOfTestsInInput))
+	(X_train_i, X_test_i) = np.split(X_set, [trainListSize])
+	(y_train_i, y_test_i) = np.split(Y_set, [trainListSize])
 
 	# convert class vectors to binary class matrices
 	Y_train = np_utils.to_categorical(y_train, nb_classes)
 	Y_test = np_utils.to_categorical(y_test, nb_classes)
+
+	return X_train, Y_train, X_test, Y_test
+
+# Call prepareDataSet() first
+# inputDrop is how much of the input to drop as a ratio [0,1]
+def run(inputDrop = 0):
+	X_train, Y_train, X_test, Y_test = getSubset(inputDrop)
 
 	model = Sequential()
 
