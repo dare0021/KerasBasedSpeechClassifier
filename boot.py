@@ -19,7 +19,7 @@ for i in range(numIterations):
 	print "Starting iteration: ", i+1, " / ", numIterations
 	print "___________________________"
 	# All .mfc files should be present in the directory given using the parameter "input"
-	score = rnn_mfcc.run(unpredictableSeed = useFreshRngSeeds)
+	score = rnn_mfcc.run("../SPK_DB/mfc13", unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
 	# input is hard coded in to preprocessor.py
 	# score = rnn_raw.run(unpredictableSeed = useFreshRngSeeds)
 	if avgScore < 0:

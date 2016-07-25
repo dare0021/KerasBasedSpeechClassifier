@@ -7,8 +7,8 @@ import numpy as np
 import time
 import mfcPreprocessor as mfcpp
 
-# input: Directory where the mfc files are in
-def run(input = "../SPK_DB/mfcs", unpredictableSeed = False):
+# input: Directory(ies) where the mfc files are in
+def run(input, unpredictableSeed = False, featureVectorSize = 13):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337) 
@@ -33,7 +33,7 @@ def run(input = "../SPK_DB/mfcs", unpredictableSeed = False):
 	# how many iterations to run
 	nb_epoch = 12
 
-	((X_train, y_train), (X_test, y_test)) = mfcpp.run(input, testRatio = ratioOfTestsInInput, percentageThreshold = percentageThreshold)
+	((X_train, y_train), (X_test, y_test)) = mfcpp.run(input, testRatio = ratioOfTestsInInput, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
 
 	print X_train.shape, y_train.shape, X_test.shape, y_test.shape
 	print X_train.dtype, y_train.dtype, X_test.dtype, y_test.dtype
@@ -74,7 +74,7 @@ def run(input = "../SPK_DB/mfcs", unpredictableSeed = False):
 
 	start = time.clock()
 	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
-	          verbose=1, validation_data=(X_test, Y_test))
+	          verbose=0, validation_data=(X_test, Y_test))
 	score = model.evaluate(X_test, Y_test, verbose=0)
 	timeTaken = time.clock() - start
 	print('Time taken:', timeTaken)

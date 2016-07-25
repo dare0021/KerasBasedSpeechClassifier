@@ -38,12 +38,22 @@ def getTruthValue(path):
 		sys.exit()
 		return -1
 
-def run(rootPath, testRatio = 0.1, percentageThreshold = 0.7):
-	fileList = [rootPath + "/" + f for f in listdir(rootPath) if isfile(join(rootPath, f)) and f.endswith(".mfc")]
-	X_train_i = unmfc.run(fileList[0])
+# rootPath is the string or an array of strings of paths of directories to use
+def run(rootPath, testRatio = 0.1, percentageThreshold = 0.7, featureVectorSize = 13):
+	rootPaths = []
+	if type(rootPath) is str:
+		rootPaths = [rootPath]
+	else: 
+		# Assume rootPath is an array
+		rootPaths = rootPath
+
+	fileList = np.array([])
+	for p in rootPaths:
+		fileList = np.append(fileList, [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")])
+	X_train_i = unmfc.run(fileList[0], featureVectorSize = featureVectorSize)
 	y_train_i = np.full((X_train_i.shape[0]), getTruthValue(fileList[0]), dtype='int8')
 	for f in fileList[1:]:
-		data = unmfc.run(f)
+		data = unmfc.run(f, featureVectorSize = featureVectorSize)
 		X_train_i = np.append(X_train_i, data, axis=0)
 		y_train_i = np.append(y_train_i, np.full((data.shape[0]), getTruthValue(f), dtype='int8'))
 
@@ -60,7 +70,8 @@ def run(rootPath, testRatio = 0.1, percentageThreshold = 0.7):
 	return ((X_train_i, y_train_i), (X_test_i, y_test_i))
 
 # for unit test
-# out = run("../SPK_DB/mfcs")
+# out = run("../SPK_DB/mfc13")
+# out = run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
 # print out[0][0].shape
 # print out[0][1].shape
 # print out[1][0].shape
