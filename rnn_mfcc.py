@@ -67,8 +67,8 @@ def getSubset(dropout):
 		# else ignore
 	
 	trainListSize = X_set.shape[0] // (1 / (1 - ratioOfTestsInInput))
-	(X_train_i, X_test_i) = np.split(X_set_i, [trainListSize])
-	(y_train_i, y_test_i) = np.split(Y_set_i, [trainListSize])
+	(X_train, X_test) = np.split(X_set_i, [trainListSize])
+	(y_train, y_test) = np.split(Y_set_i, [trainListSize])
 
 	# convert class vectors to binary class matrices
 	Y_train = np_utils.to_categorical(y_train, nb_classes)
@@ -104,8 +104,11 @@ def run(inputDrop = 0):
 	              metrics=['accuracy'])
 
 	start = time.clock()
+	# Verbose 0: No output while processing
+	# Verbose 1: Output each batch
+	# Verbose 2: Output each epoch
 	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
-	          verbose=0, validation_data=(X_test, Y_test))
+	          verbose=2, validation_data=(X_test, Y_test))
 	score = model.evaluate(X_test, Y_test, verbose=0)
 	timeTaken = time.clock() - start
 	print('Time taken:', timeTaken)
