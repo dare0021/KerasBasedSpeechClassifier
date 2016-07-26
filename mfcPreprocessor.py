@@ -2,7 +2,6 @@ import numpy as np
 import unpackMFC as unmfc
 import sys
 import re
-import random
 from os import listdir
 from os.path import isfile, join
 

@@ -44,7 +44,7 @@ def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13):
 		np.random.seed(1337)
 
 	X_set, Y_set = mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
-
+	
 	print "Total size:", X_set.size
 
 # X_train:	input for the training set
@@ -56,10 +56,19 @@ def getSubset(dropout):
 	global Y_set
 
 	shuffleTwoArrs(X_set, Y_set)
+
+	X_set_i = []
+	Y_set_i = []
+	for i in range(X_set.size):
+		if np.random.uniform(0,1) > dropout:
+			# store
+			X_set_i.append(X_set[i])
+			Y_set_i.append(Y_set[i])
+		# else ignore
 	
 	trainListSize = X_set.shape[0] // (1 / (1 - ratioOfTestsInInput))
-	(X_train_i, X_test_i) = np.split(X_set, [trainListSize])
-	(y_train_i, y_test_i) = np.split(Y_set, [trainListSize])
+	(X_train_i, X_test_i) = np.split(X_set_i, [trainListSize])
+	(y_train_i, y_test_i) = np.split(Y_set_i, [trainListSize])
 
 	# convert class vectors to binary class matrices
 	Y_train = np_utils.to_categorical(y_train, nb_classes)
