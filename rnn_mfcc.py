@@ -45,6 +45,7 @@ def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13):
 
 	X_set, Y_set = mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
 	
+	print "Dataset preparation complete"
 	print "Total size:", X_set.size
 
 # X_train:	input for the training set

@@ -12,7 +12,7 @@ def thirdsWithAThirdUnique(sequence):
 	out = np.zeros(shape=(lt,lf))
 	out[0] = sequence[0]
 	cursor = lf - l3
-	sequence = sequence.flatten()
+	sequence.ravel()
 	for i in range(1, lt):
 		nextCursor = cursor + lf - l3
 		if nextCursor + l3 > np.size(sequence):
@@ -32,7 +32,7 @@ def progressByThirds(sequence):
 	out = np.zeros(shape=(lt,lf))
 	out[0] = sequence[0]
 	cursor = l3
-	sequence = sequence.flatten()
+	sequence.ravel()
 	for i in range(1, lt):
 		nextCursor = cursor + l3
 		if nextCursor + l3 > np.size(sequence):

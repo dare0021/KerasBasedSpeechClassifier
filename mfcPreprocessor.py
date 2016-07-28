@@ -11,7 +11,7 @@ def regexMatch(pattern, string):
 # data points <= threshold are counted as zero
 # Samples with >= threshold ratio of its data points being zero are ignored
 def removeZeroSamples(x, y, datapointThreshold = 0, percentageThreshold = 1):
-	toRemove = np.array([])
+	toRemove = []
 	for i in range(x.shape[0]):
 		zeros = 0
 		total = 0
@@ -20,7 +20,7 @@ def removeZeroSamples(x, y, datapointThreshold = 0, percentageThreshold = 1):
 			if j > datapointThreshold:
 				zeros += 1
 		if ((((float)(zeros)) / total) >= percentageThreshold):
-			toRemove = np.append(toRemove, i)
+			toRemove.append(i)
 	return (np.delete(x, toRemove, axis=0),	np.delete(y, toRemove))
 
 # returns whether the file path is for a male or female speaker
@@ -259,6 +259,9 @@ def getTruthValue(path):
 	return -1
 
 # rootPath is the string or an array of strings of paths of directories to use
+# <1% drops for 0.6 
+# >20% for 0.7
+# Both of above for clean samples
 def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
 	rootPaths = []
 	if type(rootPath) is str:
@@ -268,24 +271,28 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
 		rootPaths = rootPath
 
 	print "Importing files..."
-	fileList = np.array([])
+	fileList = []
 	for p in rootPaths:
-		fileList = np.append(fileList, [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")])
+		fileList.extend([p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")])
+	fileList = np.array(fileList)
 	print fileList.size, " files found."
-	X_i = unmfc.run(fileList[0], featureVectorSize = featureVectorSize)
-	y_i = np.full((X_i.shape[0]), getTruthValue(fileList[0]), dtype='int8')
-	i = 1
-	for f in fileList[1:]:
+	X_i = []
+	y_i = []
+	i = 0
+	for f in fileList:
 		if i % 100 == 0:
 			print i, " / ", fileList.size, " files imported"
 		data = unmfc.run(f, featureVectorSize = featureVectorSize)
-		X_i = np.append(X_i, data, axis=0)
-		y_i = np.append(y_i, np.full((data.shape[0]), getTruthValue(f), dtype='int8'))
+		for datalet in data:
+			X_i.append(datalet)
+		y_i.append(np.full((data.shape[0]), getTruthValue(f), dtype='int8'))
 		i += 1
+	print "All files imported, removing near-zero samples..."
+
+	X_i = np.array(X_i, dtype='float32')
+	y_i = np.array(y_i)
 
 	(X_i, y_i) = removeZeroSamples(X_i, y_i, percentageThreshold = percentageThreshold)
-	
-	X_i = X_i.astype('float32')
 
 	X_i = X_i.reshape(X_i.shape[0], 1, X_i.shape[1], 1)
 	
@@ -293,6 +300,7 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
 
 # for unit test
 # out = run("../SPK_DB/mfc13")
+# out = run("../SPK_DB/mfc60", featureVectorSize=60)
 # out = run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
 # out = run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
 # print out[0][0].shape
