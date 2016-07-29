@@ -60,16 +60,25 @@ def getSubset(dropout):
 
 	X_set_i = []
 	Y_set_i = []
-	for i in range(X_set.size):
+
+	print "Total size: "
+	print X_set.shape
+	print Y_set.shape
+
+	for i in range(X_set.shape[0]):
 		if np.random.uniform(0,1) > dropout:
 			# store
 			X_set_i.append(X_set[i])
 			Y_set_i.append(Y_set[i])
 		# else ignore
 	
-	trainListSize = X_set.shape[0] // (1 / (1 - ratioOfTestsInInput))
+	trainListSize = len(X_set_i) // (1 / (1 - ratioOfTestsInInput))
 	(X_train, X_test) = np.split(X_set_i, [trainListSize])
 	(y_train, y_test) = np.split(Y_set_i, [trainListSize])
+
+	print "Size this iteration:"
+	print "Training: ", X_train.shape, y_train.shape
+	print "Testing: ", X_test.shape, y_test.shape
 
 	# convert class vectors to binary class matrices
 	Y_train = np_utils.to_categorical(y_train, nb_classes)

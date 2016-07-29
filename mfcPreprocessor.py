@@ -259,10 +259,10 @@ def getTruthValue(path):
 	return -1
 
 # rootPath is the string or an array of strings of paths of directories to use
-# <1% drops for 0.6 
-# >20% for 0.7
+# <1% drops for 0.7 
+# >20% for 0.6
 # Both of above for clean samples
-def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
+def run(rootPath, percentageThreshold = 0.6, featureVectorSize = 13):
 	rootPaths = []
 	if type(rootPath) is str:
 		rootPaths = [rootPath]
@@ -283,9 +283,8 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
 		if i % 100 == 0:
 			print i, " / ", fileList.size, " files imported"
 		data = unmfc.run(f, featureVectorSize = featureVectorSize)
-		for datalet in data:
-			X_i.append(datalet)
-		y_i.append(np.full((data.shape[0]), getTruthValue(f), dtype='int8'))
+		X_i.extend(data)
+		y_i.extend(np.full((data.shape[0]), getTruthValue(f), dtype='int8'))
 		i += 1
 	print "All files imported, removing near-zero samples..."
 
