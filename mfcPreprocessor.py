@@ -1,268 +1,23 @@
 import numpy as np
 import unpackMFC as unmfc
-import sys
-import re
+import speakerInfo as sinfo
 from os import listdir
 from os.path import isfile, join
+from keras.utils import np_utils
 
-def regexMatch(pattern, string):
-	return bool(re.compile(pattern).match(string))
+fileDict = dict()
+truthVals = dict()
 
-# data points <= threshold are counted as zero
-# Samples with >= threshold ratio of its data points being zero are ignored
-def removeZeroSamples(x, y, datapointThreshold = 0, percentageThreshold = 1):
-	toRemove = []
-	for i in range(x.shape[0]):
-		zeros = 0
-		total = 0
-		for j in x[i]: # ERR: x is float64 and not an Iterable
-			total += 1
-			if j > datapointThreshold:
-				zeros += 1
-		if ((((float)(zeros)) / total) >= percentageThreshold):
-			toRemove.append(i)
-	return (np.delete(x, toRemove, axis=0),	np.delete(y, toRemove))
-
-# returns whether the file path is for a male or female speaker
-def getTruthValue(path):
-	path = path[path.rfind("/")+1:]
-	# regex match increases running time by 3%
-	if regexMatch("C\d{3}_[MF]\d_(INDE|SENT)_\d{3}\.wav\.mfc", path):
-		path = path[path.find("_")+1:]
-		if path[0] == 'M':
-			return 1
-		elif path[0] == 'F':
-			return 0
-	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", path):
-		comp = int(path[1:4])
-		# Array based approach takes 300 sec / 5000 files (same)
-		# outVect = [0,1,1,0,0,0,0,1,0,0,2,0,1,0,0,0,1,2,1,0,1,1,1,0,0,0,1,1,0,1,1,1,0,1,1,1,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,0,0,1,1,2,1,0,0,1,1,1,1,0,2,2,2,1,0,0,0,2,0,1,0,0,0,1,0,1,0,0,0,0,2,0,1,0,0,0,1,1,0,0,2,2,2,2,0,2,2,1,2,2,0,0,2,2,0,1,0,0,2,2,0,0,0,2,0,2,1,2,1,2,2,2,0,2,2,2,2,2,2,2,2,1,0,0,1,1,2,2,2,2,2,2,2,2,2,1,2,1]
-		# Ctrl CV brute force 300 sec / 5000 files
-		if comp == 225:
-			return 0
-		if comp == 226:
-			return 1
-		if comp == 227:
-			return 1
-		if comp == 228:
-			return 0
-		if comp == 229:
-			return 0
-		if comp == 230:
-			return 0
-		if comp == 231:
-			return 0
-		if comp == 232:
-			return 1
-		if comp == 233:
-			return 0
-		if comp == 234:
-			return 0
-		if comp == 236:
-			return 0
-		if comp == 237:
-			return 1
-		if comp == 238:
-			return 0
-		if comp == 239:
-			return 0
-		if comp == 240:
-			return 0
-		if comp == 241:
-			return 1
-		if comp == 243:
-			return 1
-		if comp == 244:
-			return 0
-		if comp == 245:
-			return 1
-		if comp == 246:
-			return 1
-		if comp == 247:
-			return 1
-		if comp == 248:
-			return 0
-		if comp == 249:
-			return 0
-		if comp == 250:
-			return 0
-		if comp == 251:
-			return 1
-		if comp == 252:
-			return 1
-		if comp == 253:
-			return 0
-		if comp == 254:
-			return 1
-		if comp == 255:
-			return 1
-		if comp == 256:
-			return 1
-		if comp == 257:
-			return 0
-		if comp == 258:
-			return 1
-		if comp == 259:
-			return 1
-		if comp == 260:
-			return 1
-		if comp == 261:
-			return 0
-		if comp == 262:
-			return 0
-		if comp == 263:
-			return 1
-		if comp == 264:
-			return 0
-		if comp == 265:
-			return 0
-		if comp == 266:
-			return 0
-		if comp == 267:
-			return 0
-		if comp == 268:
-			return 0
-		if comp == 269:
-			return 0
-		if comp == 270:
-			return 1
-		if comp == 271:
-			return 1
-		if comp == 272:
-			return 1
-		if comp == 273:
-			return 1
-		if comp == 274:
-			return 1
-		if comp == 275:
-			return 1
-		if comp == 276:
-			return 0
-		if comp == 277:
-			return 0
-		if comp == 278:
-			return 1
-		if comp == 279:
-			return 1
-		if comp == 281:
-			return 1
-		if comp == 282:
-			return 0
-		if comp == 283:
-			return 0
-		if comp == 284:
-			return 1
-		if comp == 285:
-			return 1
-		if comp == 286:
-			return 1
-		if comp == 287:
-			return 1
-		if comp == 288:
-			return 0
-		if comp == 292:
-			return 1
-		if comp == 293:
-			return 0
-		if comp == 294:
-			return 0
-		if comp == 295:
-			return 0
-		if comp == 297:
-			return 0
-		if comp == 298:
-			return 1
-		if comp == 299:
-			return 0
-		if comp == 300:
-			return 0
-		if comp == 301:
-			return 0
-		if comp == 302:
-			return 1
-		if comp == 303:
-			return 0
-		if comp == 304:
-			return 1
-		if comp == 305:
-			return 0
-		if comp == 306:
-			return 0
-		if comp == 307:
-			return 0
-		if comp == 308:
-			return 0
-		if comp == 310:
-			return 0
-		if comp == 311:
-			return 1
-		if comp == 312:
-			return 0
-		if comp == 313:
-			return 0
-		if comp == 314:
-			return 0
-		if comp == 315:
-			return 1
-		if comp == 316:
-			return 1
-		if comp == 317:
-			return 0
-		if comp == 318:
-			return 0
-		if comp == 323:
-			return 0
-		if comp == 326:
-			return 1
-		if comp == 329:
-			return 0
-		if comp == 330:
-			return 0
-		if comp == 333:
-			return 0
-		if comp == 334:
-			return 1
-		if comp == 335:
-			return 0
-		if comp == 336:
-			return 0
-		if comp == 339:
-			return 0
-		if comp == 340:
-			return 0
-		if comp == 341:
-			return 0
-		if comp == 343:
-			return 0
-		if comp == 345:
-			return 1
-		if comp == 347:
-			return 1
-		if comp == 351:
-			return 0
-		if comp == 360:
-			return 1
-		if comp == 361:
-			return 0
-		if comp == 362:
-			return 0
-		if comp == 363:
-			return 1
-		if comp == 364:
-			return 1
-		if comp == 374:
-			return 1
-		if comp == 376:
-			return 1
-	print "mfcPreprocessor.getTruthValue() failed with input: ", path
-	sys.exit()
-	return -1
+shuffle = False
 
 # rootPath is the string or an array of strings of paths of directories to use
 # <1% drops for 0.7 
 # >20% for 0.6
 # Both of above for clean samples
-def run(rootPath, percentageThreshold = 0.6, featureVectorSize = 13):
+def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
+	global fileDict
+	global truthVals
+
 	rootPaths = []
 	if type(rootPath) is str:
 		rootPaths = [rootPath]
@@ -271,31 +26,90 @@ def run(rootPath, percentageThreshold = 0.6, featureVectorSize = 13):
 		rootPaths = rootPath
 
 	print "Importing files..."
-	fileList = []
+	fileCount = 0
 	for p in rootPaths:
-		fileList.extend([p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")])
-	fileList = np.array(fileList)
-	print fileList.size, " files found."
-	X_i = []
-	y_i = []
-	i = 0
-	for f in fileList:
-		if i % 100 == 0:
-			print i, " / ", fileList.size, " files imported"
-		data = unmfc.run(f, featureVectorSize = featureVectorSize)
-		X_i.extend(data)
-		y_i.extend(np.full((data.shape[0]), getTruthValue(f), dtype='int8'))
-		i += 1
-	print "All files imported, removing near-zero samples..."
+		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
+		fileCount += len(filesThisPath)
+		print fileCount, "files found so far."
+		for path in filesThisPath:
+			sid = sinfo.getSpeakerID(path)
+			data = unmfc.run(path, featureVectorSize = featureVectorSize)
+			if sid in fileDict:
+				fileDict[sid].extend(data)
+			else:
+				fileDict[sid] = data.tolist()
+				truthVals[sid] = sinfo.getTruthValue(f)
 
-	X_i = np.array(X_i, dtype='float32')
-	y_i = np.array(y_i)
+	print fileCount, " files found from"
+	print len(fileDict), " speakers."
 
-	(X_i, y_i) = removeZeroSamples(X_i, y_i, percentageThreshold = percentageThreshold)
+# x: ANN input MFCC data
+# y: ANN output validation data
+def collateData(speakerList):
+	global fileDict
+	global truthVals
 
-	X_i = X_i.reshape(X_i.shape[0], 1, X_i.shape[1], 1)
-	
-	return (X_i, y_i)
+	x = []
+	y = []
+	for s in speakerList:
+		data = fileDict[s]
+		x.extend(data)
+		# ERR: y is too short. x & y size mismatch
+		# difference is too large to be a boundary case. 303642 x vs 79399 y
+		y.extend(np.full((len(data)), truthVals[s], dtype='int8'))
+	return x, y
+
+def shuffleTwoArrs(x, y):
+    rng_state = np.random.get_state()
+    np.random.shuffle(x)
+    np.random.set_state(rng_state)
+    np.random.shuffle(y)
+
+# X_train:	input for the training set
+# X_test:	input for the test set
+# y_train:	result for the training set
+# y_test:	result for the test set
+# dropout:	ratio of the superset to disregard
+# dropout is done here to make sure the np.array generated is not bigger than it has to be
+# since using Keras dropout would mean feeding everything in to the ANN
+def getSubset(nb_classes, dropout, ratioOfTestsInInput):
+	global fileDict
+	global truthVals
+
+	# generate chosen speakers
+		# randomly drop speakers
+		# randomly choose test set speakers
+
+	# create X & Y sets
+		# X set should be [None, 1, freq, 1]
+		# TODO: use a 2D set of mfcc data instead of single time steps
+		# Y set should be [None, 1] and match the X set in cardinality
+
+	speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
+	trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
+	np.random.shuffle(speakerList)
+	speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
+	print "Training set:", speakersTrain
+	print "Testing  set:", speakersTest
+
+	X_train, Y_train = collateData(speakersTrain)
+	X_test, Y_test = collateData(speakersTest)
+
+	if shuffle is True:
+		shuffleTwoArrs(X_train, Y_train)
+		shuffleTwoArrs(X_test, Y_test)
+
+	Y_train = np_utils.to_categorical(Y_train, nb_classes)
+	Y_test = np_utils.to_categorical(Y_test, nb_classes)
+
+	X_train = np.array(X_train, dtype='float32')
+	X_test = np.array(X_test, dtype='float32')
+
+	X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
+	X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
+
+	return X_train, Y_train, X_test, Y_test
+
 
 # for unit test
 # out = run("../SPK_DB/mfc13")

@@ -1,7 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.utils import np_utils
 
 import numpy as np
 import time
@@ -25,71 +24,27 @@ nb_classes = 2
 # how many iterations to run
 nb_epoch = 12
 
-X_set = None
-Y_set = None
-
-def shuffleTwoArrs(x, y):
-    rng_state = np.random.get_state()
-    np.random.shuffle(x)
-    np.random.set_state(rng_state)
-    np.random.shuffle(y)
-
 # input: Directory(ies) where the mfc files are in
 def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13):
-	global X_set
-	global Y_set
-
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
 
-	X_set, Y_set = mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
-	
-	print "Dataset preparation complete"
-	print "Total size:", X_set.size
+	mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
 
-# X_train:	input for the training set
-# X_test:	input for the test set
-# y_train:	result for the training set
-# y_test:	result for the test set
-def getSubset(dropout):
-	global X_set
-	global Y_set
-
-	shuffleTwoArrs(X_set, Y_set)
-
-	X_set_i = []
-	Y_set_i = []
-
-	print "Total size: "
-	print X_set.shape
-	print Y_set.shape
-
-	for i in range(X_set.shape[0]):
-		if np.random.uniform(0,1) > dropout:
-			# store
-			X_set_i.append(X_set[i])
-			Y_set_i.append(Y_set[i])
-		# else ignore
-	
-	trainListSize = len(X_set_i) // (1 / (1 - ratioOfTestsInInput))
-	(X_train, X_test) = np.split(X_set_i, [trainListSize])
-	(y_train, y_test) = np.split(Y_set_i, [trainListSize])
-
-	print "Size this iteration:"
-	print "Training: ", X_train.shape, y_train.shape
-	print "Testing: ", X_test.shape, y_test.shape
-
-	# convert class vectors to binary class matrices
-	Y_train = np_utils.to_categorical(y_train, nb_classes)
-	Y_test = np_utils.to_categorical(y_test, nb_classes)
-
-	return X_train, Y_train, X_test, Y_test
+# Evaluation function for collating the files' various time steps' predictions
+def evaluate(predictions):
+	pass
 
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 def run(inputDrop = 0):
-	X_train, Y_train, X_test, Y_test = getSubset(inputDrop)
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
+
+	print "X_train", X_train.shape
+	print "Y_train", Y_train.shape
+	print "X_test", X_test.shape
+	print "Y_test", Y_test.shape
 
 	model = Sequential()
 
@@ -121,7 +76,10 @@ def run(inputDrop = 0):
 	          verbose=2, validation_data=(X_test, Y_test))
 	score = model.evaluate(X_test, Y_test, verbose=0)
 	timeTaken = time.clock() - start
+	# acc = evaluate(model.predict(X_test, verbose=0))
 	print('Time taken:', timeTaken)
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
+	# print('Evaluator accuracy:', acc)
+	# return (score[0], acc, timeTaken)
 	return (score[0], score[1], timeTaken)

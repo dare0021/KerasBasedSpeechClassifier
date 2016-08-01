@@ -3,7 +3,7 @@ import rnn_mfcc
 import rnn_raw
 
 # Number of iterations of traning / testing sets to run
-numIterations = 100
+numIterations = 10
 
 # If false will use seed "1337" instead of current time
 useFreshRngSeeds = True
@@ -14,14 +14,13 @@ avgTime = -1
 avgScore = -1
 avgAcc = -1
 # Uncomment the section(s) to use
-# rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
-rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
+rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
 for i in range(numIterations):
 	print "___________________________"
 	print "Starting iteration: ", i+1, " / ", numIterations
 	print "___________________________"
 	# All .mfc files should be present in the directory given using the parameter "input"
-	score = rnn_mfcc.run(inputDrop = 0.8)
+	score = rnn_mfcc.run(inputDrop = 0.0)
 	# input is hard coded in to preprocessor.py
 	# score = rnn_raw.run(unpredictableSeed = useFreshRngSeeds)
 	if avgScore < 0:
