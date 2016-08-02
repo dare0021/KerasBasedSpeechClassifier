@@ -14,7 +14,11 @@ avgTime = -1
 avgScore = -1
 avgAcc = -1
 # Uncomment the section(s) to use
-rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
+ets = None
+# ets = [[], \
+# 		[]]
+# rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
+rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
 for i in range(numIterations):
 	print "___________________________"
 	print "Starting iteration: ", i+1, " / ", numIterations

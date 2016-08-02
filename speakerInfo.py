@@ -1,4 +1,5 @@
 # Contains information about the files being used
+# Separated out since 1) it's long, and 2) the code should change according to what files are used
 
 import re
 import sys

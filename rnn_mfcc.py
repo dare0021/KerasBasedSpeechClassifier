@@ -25,12 +25,12 @@ nb_classes = 2
 nb_epoch = 12
 
 # input: Directory(ies) where the mfc files are in
-def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13):
+def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, explicitTestSet = None):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
 
-	mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize)
+	mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize, explicitTestSet = None)
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(predictions):

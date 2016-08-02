@@ -9,25 +9,53 @@ fileDict = dict()
 truthVals = dict()
 
 shuffle = False
+explicit_X_test = []
+explicit_Y_test = []
+
+def strToArr(input):
+	if type(input) is str:
+		return [input]
+	return input
+
+def loadTestSetAuto(rootPath, featureVectorSize = 13):
+	global explicit_X_test
+	global explicit_Y_test
+
+	rootPath = strToArr(rootPath)
+	for p in rootPath:
+		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
+		for path in filesThisPath:
+			data = unmfc.run(path, featureVectorSize = featureVectorSize)
+			explicit_X_test.extend(data)
+			explicit_Y_test.extend(np.full((len(data)), sinfo.getTruthValue(path), dtype='int8'))
+
 
 # rootPath is the string or an array of strings of paths of directories to use
+# percentageThreshold is when to drop a feature vector by how much of it is zero
+# not implemented in this version
 # <1% drops for 0.7 
 # >20% for 0.6
 # Both of above for clean samples
-def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
+# explicitTestSet[0] contains paths, while explicitTestSet[1] contains truth values
+def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTestSet = None):
 	global fileDict
 	global truthVals
+	global explicit_X_test
+	global explicit_Y_test
 
-	rootPaths = []
-	if type(rootPath) is str:
-		rootPaths = [rootPath]
-	else: 
-		# Assume rootPath is an array
-		rootPaths = rootPath
+	rootPath = strToArr(rootPath)
+	if explicitTestSet != None:
+		explicitTestSet = strToArr(explicitTestSet[0])
+		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize)
+		i = 0
+		for f in explicitTestSet:
+			explicit_X_test.extend(f)
+			explicit_Y_test.extend(np.full((len(f)), explicitTestSet[1][i], dtype='int8'))
+			i += 1
 
 	print "Importing files..."
 	fileCount = 0
-	for p in rootPaths:
+	for p in rootPath:
 		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
 		fileCount += len(filesThisPath)
 		print fileCount, "files found so far."
@@ -38,7 +66,7 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13):
 				fileDict[sid].extend(data)
 			else:
 				fileDict[sid] = data.tolist()
-				truthVals[sid] = sinfo.getTruthValue(f)
+				truthVals[sid] = sinfo.getTruthValue(path)
 
 	print fileCount, " files found from"
 	print len(fileDict), " speakers."
@@ -75,6 +103,14 @@ def shuffleTwoArrs(x, y):
 def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 	global fileDict
 	global truthVals
+	global shuffle
+	global explicit_X_test
+	global explicit_Y_test
+
+	if (len(explicit_Y_test) > 0) and (ratioOfTestsInInput > 0):
+		print "ERR: can't have both explicit test set and randomly sampled tests from the training sample"
+		import sys
+		sys.exit()
 
 	# generate chosen speakers
 		# randomly drop speakers
@@ -85,30 +121,55 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		# TODO: use a 2D set of mfcc data instead of single time steps
 		# Y set should be [None, 1] and match the X set in cardinality
 
-	speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
-	trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
-	np.random.shuffle(speakerList)
-	speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
-	print "Training set:", speakersTrain
-	print "Testing  set:", speakersTest
+	if len(explicit_Y_test) <= 0:
+		speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
+		np.random.shuffle(speakerList)
 
-	X_train, Y_train = collateData(speakersTrain)
-	X_test, Y_test = collateData(speakersTest)
+		trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
+		speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
 
-	if shuffle is True:
-		shuffleTwoArrs(X_train, Y_train)
-		shuffleTwoArrs(X_test, Y_test)
+		X_train, Y_train = collateData(speakersTrain)
+		X_test, Y_test = collateData(speakersTest)
 
-	Y_train = np_utils.to_categorical(Y_train, nb_classes)
-	Y_test = np_utils.to_categorical(Y_test, nb_classes)
+		if shuffle is True:
+			shuffleTwoArrs(X_train, Y_train)
+			shuffleTwoArrs(X_test, Y_test)
 
-	X_train = np.array(X_train, dtype='float32')
-	X_test = np.array(X_test, dtype='float32')
+		Y_train = np_utils.to_categorical(Y_train, nb_classes)
+		Y_test = np_utils.to_categorical(Y_test, nb_classes)
 
-	X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
-	X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
+		X_train = np.array(X_train, dtype='float32')
+		X_test = np.array(X_test, dtype='float32')
 
-	return X_train, Y_train, X_test, Y_test
+		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
+		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
+
+		print "Training set:", speakersTrain
+		print "Testing  set:", speakersTest
+
+		return X_train, Y_train, X_test, Y_test
+	else:
+		speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
+		np.random.shuffle(speakerList)
+
+		X_train, Y_train = collateData(speakerList)
+
+		if shuffle is True:
+			shuffleTwoArrs(X_train, Y_train)
+
+		Y_train = np_utils.to_categorical(Y_train, nb_classes)
+		Y_test = np_utils.to_categorical(explicit_Y_test, nb_classes)
+
+		X_train = np.array(X_train, dtype='float32')
+		X_test = np.array(explicit_X_test, dtype='float32')
+
+		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
+		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
+
+		print "Training set:", speakersTrain
+		print "Testing  set:", speakersTest
+		
+		return X_train, Y_train, X_test, Y_test
 
 
 # for unit test
@@ -120,3 +181,7 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 # print out[0][1].shape
 # print out[1][0].shape
 # print out[1][1].shape
+# loadTestSetAuto("../SPK_DB/mfc13")
+# loadTestSetAuto(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"])
+# print np.array(explicit_X_test).shape
+# print np.array(explicit_Y_test).shape

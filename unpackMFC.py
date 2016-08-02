@@ -19,3 +19,9 @@ def run(input, featureVectorSize):
 	for i in range(size):
 		out[i//featureVectorSize][i%featureVectorSize] = struct.unpack('>f', ''.join(file.read(4)))[0]
 	return out
+
+def runForAll(input, featureVectorSize):
+	out = []
+	for i in input:
+		out.append(run(i, featureVectorSize))
+	return out
