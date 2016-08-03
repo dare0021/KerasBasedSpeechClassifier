@@ -33,12 +33,30 @@ def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, exp
 	mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize, explicitTestSet = None)
 
 # Evaluation function for collating the files' various time steps' predictions
-def evaluate(predictions):
-	pass
+# accThresh:	Files with accuracy above or equal this are counted as correct
+def evaluate(model, accThresh = 0.5):
+	testSpeakers = mfcpp.testSpeakers
+	accSum = 0
+	i = 0
+	for s in testSpeakers:
+		featVects = mfcpp.fileDict[s]
+		truthVal = mfcpp.truthVals[s]
+		for f in fileFeatVects:
+			i += 1
+			score = model.evaluate(f, np.full((len(f)), truthVal, dtype='int8'), verbose=0)
+			if score[1] > accThresh:
+				accSum += 1
+	return ((float)(accSum)) / i
+	# get feature vectors from a directory
+	# recurse over the directory one file at a time
+		# get the file's feature vectors
+		# model.evaluate() over the vectors
+		# parse the resultant accuracy (score[1]) as a correct or incorrect outcome
+	# return the ratio of correct outcomes
 
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
-def run(inputDrop = 0):
+def run(inputDrop = 0, returnCustomEvalAccuracy = True):
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
 
 	print "X_train", X_train.shape
@@ -74,12 +92,14 @@ def run(inputDrop = 0):
 	# Verbose 2: Output each epoch
 	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
 	          verbose=2, validation_data=(X_test, Y_test))
-	score = model.evaluate(X_test, Y_test, verbose=0)
+	if ratioOfTestsInInput > 0:
+		score = model.evaluate(X_test, Y_test, verbose=0)
 	timeTaken = time.clock() - start
-	# acc = evaluate(model.predict(X_test, verbose=0))
+
 	print('Time taken:', timeTaken)
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
-	# print('Evaluator accuracy:', acc)
-	# return (score[0], acc, timeTaken)
+	print('Evaluator accuracy:', acc)
+	if returnCustomEvalAccuracy:
+		return (-1, evaluate(model), timeTaken)
 	return (score[0], score[1], timeTaken)

@@ -5,12 +5,15 @@ from os import listdir
 from os.path import isfile, join
 from keras.utils import np_utils
 
+# speakerID -> 3D array of feature vectors grouped by file
 fileDict = dict()
 truthVals = dict()
 
 shuffle = False
 explicit_X_test = []
 explicit_Y_test = []
+
+testSpeakers = []
 
 def strToArr(input):
 	if type(input) is str:
@@ -26,9 +29,8 @@ def loadTestSetAuto(rootPath, featureVectorSize = 13):
 		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
 		for path in filesThisPath:
 			data = unmfc.run(path, featureVectorSize = featureVectorSize)
-			explicit_X_test.extend(data)
+			explicit_X_test.append(data)
 			explicit_Y_test.extend(np.full((len(data)), sinfo.getTruthValue(path), dtype='int8'))
-
 
 # rootPath is the string or an array of strings of paths of directories to use
 # percentageThreshold is when to drop a feature vector by how much of it is zero
@@ -63,9 +65,9 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTes
 			sid = sinfo.getSpeakerID(path)
 			data = unmfc.run(path, featureVectorSize = featureVectorSize)
 			if sid in fileDict:
-				fileDict[sid].extend(data)
+				fileDict[sid].append(data)
 			else:
-				fileDict[sid] = data.tolist()
+				fileDict[sid] = [data.tolist()]
 				truthVals[sid] = sinfo.getTruthValue(path)
 
 	print fileCount, " files found from"
@@ -81,10 +83,9 @@ def collateData(speakerList):
 	y = []
 	for s in speakerList:
 		data = fileDict[s]
-		x.extend(data)
-		# ERR: y is too short. x & y size mismatch
-		# difference is too large to be a boundary case. 303642 x vs 79399 y
-		y.extend(np.full((len(data)), truthVals[s], dtype='int8'))
+		for f in data:
+			x.extend(f)
+			y.extend(np.full((len(f)), truthVals[s], dtype='int8'))
 	return x, y
 
 def shuffleTwoArrs(x, y):
@@ -106,6 +107,7 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 	global shuffle
 	global explicit_X_test
 	global explicit_Y_test
+	global testSpeakers
 
 	if (len(explicit_Y_test) > 0) and (ratioOfTestsInInput > 0):
 		print "ERR: can't have both explicit test set and randomly sampled tests from the training sample"
@@ -127,6 +129,7 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 
 		trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
 		speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
+		testSpeakers = speakersTest
 
 		X_train, Y_train = collateData(speakersTrain)
 		X_test, Y_test = collateData(speakersTest)
@@ -173,14 +176,12 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 
 
 # for unit test
-# out = run("../SPK_DB/mfc13")
-# out = run("../SPK_DB/mfc60", featureVectorSize=60)
-# out = run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
-# out = run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
-# print out[0][0].shape
-# print out[0][1].shape
-# print out[1][0].shape
-# print out[1][1].shape
+# run("../SPK_DB/mfc13")
+# run("../SPK_DB/mfc60", featureVectorSize=60)
+# run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
+# run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
+# print fileDict
+# print truthVals
 # loadTestSetAuto("../SPK_DB/mfc13")
 # loadTestSetAuto(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"])
 # print np.array(explicit_X_test).shape
