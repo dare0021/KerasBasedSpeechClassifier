@@ -24,6 +24,12 @@ nb_classes = 2
 # how many iterations to run
 nb_epoch = 12
 
+# learning rate change momentum (if applicable)
+# example settings: 
+# nb_epoch=50, decayLR=0.1, momentumLR=0.8
+# nb_epoch=25, decayLR=0.01, momentumLR=0.9
+momentumLR = 0.8
+
 # input: Directory(ies) where the mfc files are in
 def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, explicitTestSet = None):
 	# for reproducibility
@@ -56,7 +62,8 @@ def evaluate(model, accThresh = 0.5):
 
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
-def run(inputDrop = 0, returnCustomEvalAccuracy = True):
+# decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
+def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
 
 	print "X_train", X_train.shape
@@ -82,8 +89,14 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True):
 	model.add(Dense(nb_classes))
 	model.add(Activation('softmax'))
 
+	optimizer = None
+	if decayLR > 0:
+		decay_rate = decayLR / nb_epoch
+		optimizer = SGD(lr=decayLR, momentum=momentumLR, decay=decay_rate, nesterov=False)
+	else:
+		optimizer = 'adadelta'
 	model.compile(loss='categorical_crossentropy',
-	              optimizer='adadelta',
+	              optimizer=optimizer,
 	              metrics=['accuracy'])
 
 	start = time.clock()
