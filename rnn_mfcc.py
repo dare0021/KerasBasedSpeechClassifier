@@ -24,6 +24,9 @@ nb_classes = 2
 # how many iterations to run
 nb_epoch = 12
 
+# ! adadelta (the default optimizer) has multiple learning rates which the algorithm tunes automatically
+# SGD Decay might result in worse performance
+
 # learning rate change momentum (if applicable)
 # example settings: 
 # nb_epoch=50, decayLR=0.1, momentumLR=0.8
@@ -112,7 +115,8 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 	print('Time taken:', timeTaken)
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
-	print('Evaluator accuracy:', acc)
 	if returnCustomEvalAccuracy:
-		return (-1, evaluate(model), timeTaken)
+		acc = evaluate(model)
+		print('Evaluator accuracy:', acc)
+		return (-1, acc, timeTaken)
 	return (score[0], score[1], timeTaken)
