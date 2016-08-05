@@ -27,7 +27,7 @@ for i in range(numIterations):
 	score = rnn_mfcc.run(inputDrop = 0.0)
 	# input is hard coded in to preprocessor.py
 	# score = rnn_raw.run(unpredictableSeed = useFreshRngSeeds)
-	if avgScore < 0:
+	if avgTime < 0:
 		avgTime = score[2]
 		avgScore = score[0]
 		avgAcc = score[1]
