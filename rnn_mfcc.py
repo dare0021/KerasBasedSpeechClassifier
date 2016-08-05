@@ -1,6 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
+from keras.utils import np_utils
 
 import numpy as np
 import time
@@ -51,8 +52,9 @@ def evaluate(model, accThresh = 0.5):
 		fileFeatVects = mfcpp.fileDict[s]
 		truthVal = mfcpp.truthVals[s]
 		for f in fileFeatVects:
+			x = np.array(f)
 			i += 1
-			score = model.evaluate(f, np.full((len(f)), truthVal, dtype='int8'), verbose=0)
+			score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], 1), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), nb_classes), verbose=0)
 			if score[1] > accThresh:
 				accSum += 1
 	return ((float)(accSum)) / i
