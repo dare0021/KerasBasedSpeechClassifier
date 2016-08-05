@@ -97,6 +97,7 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 	optimizer = None
 	if decayLR > 0:
+		from keras.optimizers import SGD
 		decay_rate = decayLR / nb_epoch
 		optimizer = SGD(lr=decayLR, momentum=momentumLR, decay=decay_rate, nesterov=False)
 	else:
