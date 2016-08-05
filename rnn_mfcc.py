@@ -48,7 +48,7 @@ def evaluate(model, accThresh = 0.5):
 	accSum = 0
 	i = 0
 	for s in testSpeakers:
-		featVects = mfcpp.fileDict[s]
+		fileFeatVects = mfcpp.fileDict[s]
 		truthVal = mfcpp.truthVals[s]
 		for f in fileFeatVects:
 			i += 1
