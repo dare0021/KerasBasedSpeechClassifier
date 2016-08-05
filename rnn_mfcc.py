@@ -43,8 +43,9 @@ def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, exp
 	mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize, explicitTestSet = None)
 
 # Evaluation function for collating the files' various time steps' predictions
-# accThresh:	Files with accuracy above or equal this are counted as correct
-def evaluate(model, accThresh = 0.5):
+# accThresh:	Files with accuracy above this are counted as correct
+# 				Automatically set to one over nb_classes
+def evaluate(model, accThresh = ((float)(1))/nb_classes):
 	testSpeakers = mfcpp.testSpeakers
 	accSum = 0
 	i = 0
@@ -55,7 +56,7 @@ def evaluate(model, accThresh = 0.5):
 			x = np.array(f)
 			i += 1
 			score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], 1), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), nb_classes), verbose=0)
-			if score[1] >= accThresh:
+			if score[1] > accThresh:
 				accSum += 1
 	return ((float)(accSum)) / i
 	# get feature vectors from a directory
