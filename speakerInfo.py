@@ -8,7 +8,12 @@ def regexMatch(pattern, string):
 	return bool(re.compile(pattern).match(string))
 
 # returns whether the file path is for a male or female speaker
+# 0: Male
+# 1: Female
+# 2: Silence
 def getTruthValue(path):
+	if 'OnlySilences' in path:
+		return 2
 	path = path[path.rfind("/")+1:]
 	# regex match increases running time by 3%
 	if regexMatch("C\d{3}_[MF]\d_(INDE|SENT)_\d{3}\.wav\.mfc", path):
@@ -242,7 +247,10 @@ def getTruthValue(path):
 	sys.exit()
 	return -1
 
+# -1: Silences
 def getSpeakerID(path):
+	if 'OnlySilences' in path:
+		return -1
 	path = path[path.rfind("/")+1:]
 	# regex match increases running time by 3%
 	if regexMatch("C\d{3}_[MF]\d_(INDE|SENT)_\d{3}\.wav\.mfc", path):

@@ -20,10 +20,10 @@ filter_len = 3
 
 # number of samples before weight update
 batch_size = 128
-# number of possible classes. In this case, just 2 (TODO: should be 3 after adding noise)
-nb_classes = 2
+# number of possible classes
+nb_classes = 3
 # how many iterations to run
-nb_epoch = 50
+nb_epoch = 13
 
 # ! adadelta (the default optimizer) has multiple learning rates which the algorithm tunes automatically
 # SGD Decay might result in worse performance
@@ -44,8 +44,8 @@ def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, exp
 
 # Evaluation function for collating the files' various time steps' predictions
 # accThresh:	Files with accuracy above this are counted as correct
-# 				Automatically set to one over nb_classes
-def evaluate(model, accThresh = ((float)(1))/nb_classes):
+# 				Manually set due to the otherGroup messing with it
+def evaluate(model, accThresh = .5):
 	testSpeakers = mfcpp.testSpeakers
 	accSum = 0
 	i = 0
@@ -69,7 +69,7 @@ def evaluate(model, accThresh = ((float)(1))/nb_classes):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0.1):
+def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
 
 	print "X_train", X_train.shape
