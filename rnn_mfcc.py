@@ -23,7 +23,7 @@ batch_size = 128
 # number of possible classes. In this case, just 2 (TODO: should be 3 after adding noise)
 nb_classes = 2
 # how many iterations to run
-nb_epoch = 12
+nb_epoch = 50
 
 # ! adadelta (the default optimizer) has multiple learning rates which the algorithm tunes automatically
 # SGD Decay might result in worse performance
@@ -69,7 +69,7 @@ def evaluate(model, accThresh = ((float)(1))/nb_classes):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
+def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0.1):
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
 
 	print "X_train", X_train.shape
@@ -97,8 +97,9 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 	optimizer = None
 	if decayLR > 0:
+		from keras.optimizers import SGD
 		decay_rate = decayLR / nb_epoch
-		optimizer = SGD(lr=decayLR, momentum=momentumLR, decay=decay_rate, nesterov=False)
+		optimizer = SGD(lr=decayLR, momentum=momentumLR, decay=decay_rate, nesterov=True)
 	else:
 		optimizer = 'adadelta'
 	model.compile(loss='categorical_crossentropy',
