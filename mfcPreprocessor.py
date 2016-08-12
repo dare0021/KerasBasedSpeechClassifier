@@ -13,11 +13,12 @@ otherData = dict()
 otherDataKeys = [-1]
 truthVals = dict()
 
-shuffle = False
 explicit_X_test = []
 explicit_Y_test = []
 
 testSpeakers = []
+
+windowed = False
 
 def strToArr(input):
 	if type(input) is str:
@@ -43,17 +44,24 @@ def loadTestSetAuto(rootPath, featureVectorSize = 13):
 # >20% for 0.6
 # Both of above for clean samples
 # explicitTestSet[0] contains paths, while explicitTestSet[1] contains truth values
-def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTestSet = None):
+def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTestSet = None, windowedMode = windowed):
 	global fileDict
 	global otherData
 	global truthVals
 	global explicit_X_test
 	global explicit_Y_test
+	global windowed
+
+	windowed = windowedMode
+	if windowedMode:
+		unpackFunc = unmfc.returnWindowed
+	else:
+		unpackFunc = unmfc.run
 
 	rootPath = strToArr(rootPath)
 	if explicitTestSet != None:
 		explicitTestSet = strToArr(explicitTestSet[0])
-		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize)
+		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize, windowedMode)
 		i = 0
 		for f in explicitTestSet:
 			explicit_X_test.extend(f)
@@ -66,11 +74,9 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTes
 		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
 		fileCount += len(filesThisPath)
 		print fileCount, "files found so far."
-		# TODO: group mfcc in to a 2D struct st the vectors are grouped in to 3sec segments instead of
-		# 		the current 10ms frames
 		for path in filesThisPath:
 			sid = sinfo.getSpeakerID(path)
-			data = unmfc.run(path, featureVectorSize = featureVectorSize)
+			data = unpackFunc(path, featureVectorSize = featureVectorSize)
 			if sid in fileDict:
 				fileDict[sid].append(data)
 			elif sid in otherData:
@@ -108,12 +114,6 @@ def collateData(speakerList):
 			y.extend(np.full((len(f)), truthVals[s], dtype='int8'))
 	return x, y
 
-def shuffleTwoArrs(x, y):
-    rng_state = np.random.get_state()
-    np.random.shuffle(x)
-    np.random.set_state(rng_state)
-    np.random.shuffle(y)
-
 # X_train:	input for the training set
 # X_test:	input for the test set
 # y_train:	result for the training set
@@ -125,7 +125,6 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 	global fileDict
 	global otherData
 	global truthVals
-	global shuffle
 	global explicit_X_test
 	global explicit_Y_test
 	global testSpeakers
@@ -159,10 +158,6 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		X_train, Y_train = collateData(speakersTrain)
 		X_test, Y_test = collateData(speakersTest)
 
-		if shuffle is True:
-			shuffleTwoArrs(X_train, Y_train)
-			shuffleTwoArrs(X_test, Y_test)
-
 		Y_train = np_utils.to_categorical(Y_train, nb_classes)
 		Y_test = np_utils.to_categorical(Y_test, nb_classes)
 
@@ -178,17 +173,19 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		speakersTrain = np.append(speakersTrain, otherGroup)
 		X_train, Y_train = collateData(speakerList)
 
-		if shuffle is True:
-			shuffleTwoArrs(X_train, Y_train)
-
 		Y_train = np_utils.to_categorical(Y_train, nb_classes)
 		Y_test = np_utils.to_categorical(explicit_Y_test, nb_classes)
 
 		X_train = np.array(X_train, dtype='float32')
 		X_test = np.array(explicit_X_test, dtype='float32')
 
-	X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
-	X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
+	if windowed:
+		print X_train.shape
+		X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2], 1)
+		X_test = X_test.reshape(X_test.shape[0], X_train.shape[1], X_train.shape[2], 1)
+	else:
+		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
+		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
 
 	print "Training set:", speakersTrain
 	print "Testing  set:", speakersTest
@@ -197,7 +194,9 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 
 
 # for unit test
-# run("../SPK_DB/mfc13")
+# run("../SPK_DB/mfc13", windowedMode = True)
+# for x in fileDict[1]:
+# 	print np.array(x).shape
 # run("../SPK_DB/mfc60", featureVectorSize=60)
 # run(["../SPK_DB/mfc13", "../SPK_DB/mfc60"])
 # run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
@@ -207,3 +206,4 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 # loadTestSetAuto(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"])
 # print np.array(explicit_X_test).shape
 # print np.array(explicit_Y_test).shape
+# print getSubset(3, 0, .1)
