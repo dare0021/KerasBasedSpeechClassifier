@@ -18,7 +18,7 @@ ets = None
 # ets = [[], \
 # 		[]]
 # rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
-rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13NoSilences2e5", "../SPK_DB/mfc13OnlySilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
+rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13NoSilences2e5", "../SPK_DB/mfc13OnlySilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13OnlySilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
 for i in range(numIterations):
 	print "___________________________"
 	print "Starting iteration: ", i+1, " / ", numIterations
@@ -42,5 +42,4 @@ print "Average time taken:\t", avgTime/numIterations
 print "Average score:\t", avgScore/numIterations
 print "Average accuracy:\t", avgAcc/numIterations
 
-# TODO: test with 60 features instead of the current default 13
-# 		Also, fiddle around with the ANN settings.
+# TODO: Fiddle around with the ANN settings & EnergyFilter thresh
