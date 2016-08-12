@@ -3,7 +3,7 @@ import numpy as np
 # Example:
 # in: 0-30 30-60 ...
 # out: 0-30 20-50 40-70 ...
-# Last sample might be padded up to its last theird but never more than that
+# Last sample might be padded up to its last third but never more than that
 # if the samples does not cleanly divide to thirds, the dividend is (int) of the float. i.e. drops the remainders.
 def thirdsWithAThirdUnique(sequence):
 	l3 = sequence.shape[1] // 3
@@ -12,7 +12,7 @@ def thirdsWithAThirdUnique(sequence):
 	out = np.zeros(shape=(lt,lf))
 	out[0] = sequence[0]
 	cursor = lf - l3
-	sequence.ravel()
+	sequence = sequence.flatten()
 	for i in range(1, lt):
 		nextCursor = cursor + lf - l3
 		if nextCursor + l3 > np.size(sequence):
@@ -32,7 +32,7 @@ def progressByThirds(sequence):
 	out = np.zeros(shape=(lt,lf))
 	out[0] = sequence[0]
 	cursor = l3
-	sequence.ravel()
+	sequence = sequence.flatten()
 	for i in range(1, lt):
 		nextCursor = cursor + l3
 		if nextCursor + l3 > np.size(sequence):

@@ -66,6 +66,8 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTes
 		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
 		fileCount += len(filesThisPath)
 		print fileCount, "files found so far."
+		# TODO: group mfcc in to a 2D struct st the vectors are grouped in to 3sec segments instead of
+		# 		the current 10ms frames
 		for path in filesThisPath:
 			sid = sinfo.getSpeakerID(path)
 			data = unmfc.run(path, featureVectorSize = featureVectorSize)

@@ -1,5 +1,6 @@
 import numpy as np
 import struct
+import overlappingSamples as ols
 
 # CMU Sphinx 4 mfc file opener
 # takes file path as input
@@ -20,8 +21,16 @@ def run(input, featureVectorSize):
 		out[i//featureVectorSize][i%featureVectorSize] = struct.unpack('>f', ''.join(file.read(4)))[0]
 	return out
 
+# Returns windowed result
+# e.g. for frames 1,2,3,4,5: [[1,2,3], [2,3,4], [3,4,5]]
+def returnWindowed(input, featureVectorSize):
+	raw = run(input, featureVectorSize)
+	return ols.run(raw)
+
 def runForAll(input, featureVectorSize):
 	out = []
 	for i in input:
 		out.append(run(i, featureVectorSize))
 	return out
+
+# print returnWindowed("../SPK_DB/mfc13OnlySilences2e5/C002_M4_INDE_025.wav.mfc", 13).shape
