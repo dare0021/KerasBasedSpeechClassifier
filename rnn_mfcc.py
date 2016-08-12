@@ -86,6 +86,7 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 		model = Sequential()
 
+		# TODO: finish implementing windowed input. Dimensions are all wrong.
 		model.add(Convolution2D(nb_filters, filter_len, 1,
 		                        border_mode='valid',
 		                        input_shape=(1, X_train.shape[2], 1)))
