@@ -23,9 +23,17 @@ def run(input, featureVectorSize):
 
 # Returns windowed result
 # e.g. for frames 1,2,3,4,5: [[1,2,3], [2,3,4], [3,4,5]]
-def returnWindowed(input, featureVectorSize):
+# windowSize is in frames
+# a frame is 10ms
+# recommended value: 1~3 sec
+def returnWindowed(input, featureVectorSize, windowSize):
 	raw = run(input, featureVectorSize)
-	return ols.run(raw)
+	numcells = len(raw) // windowSize
+	if len(raw) % windowSize > 0:
+		numcells += 1
+	raw = raw.flatten()
+	raw = np.append(raw, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(raw))))
+	return raw.reshape(numcells, windowSize, featureVectorSize)
 
 def runForAll(input, featureVectorSize):
 	out = []
@@ -33,4 +41,4 @@ def runForAll(input, featureVectorSize):
 		out.append(run(i, featureVectorSize))
 	return out
 
-# print returnWindowed("../SPK_DB/mfc13OnlySilences2e5/C002_M4_INDE_025.wav.mfc", 13).shape
+# print returnWindowed("../SPK_DB/mfc13OnlySilences2e5/C002_M4_INDE_025.wav.mfc", 13, 100).shape
