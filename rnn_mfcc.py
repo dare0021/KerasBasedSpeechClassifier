@@ -6,6 +6,7 @@ from keras.utils import np_utils
 import numpy as np
 import time
 import mfcPreprocessor as mfcpp
+import unpackMFC as umfc
 
 # Ratio of tests vs input. Training set is (1 - this) of the input.
 ratioOfTestsInInput = 0.1
@@ -86,14 +87,13 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 		model = Sequential()
 
-		# TODO: finish implementing windowed input. Dimensions are all wrong.
-		model.add(Convolution2D(nb_filters, filter_len, 1,
+		model.add(Convolution2D(nb_filters, filter_len, filter_len,
 		                        border_mode='valid',
-		                        input_shape=(1, X_train.shape[2], 1)))
+		                        input_shape=(1, umfc.windowSize, X_train.shape[3])))
 		model.add(Activation('relu'))
-		model.add(Convolution2D(nb_filters, filter_len, 1))
+		model.add(Convolution2D(nb_filters, filter_len, filter_len))
 		model.add(Activation('relu'))
-		model.add(MaxPooling2D(pool_size=(2,1)))
+		model.add(MaxPooling2D(pool_size=(2,2)))
 
 
 		model.add(Flatten())
