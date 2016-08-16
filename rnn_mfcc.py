@@ -51,6 +51,8 @@ def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, exp
 # accThresh:	Files with accuracy above this are counted as correct
 # 				Manually set due to the otherGroup messing with it
 def evaluate(model, accThresh = .5):
+	global windowed
+
 	testSpeakers = mfcpp.testSpeakers
 	accSum = 0
 	i = 0
@@ -60,7 +62,10 @@ def evaluate(model, accThresh = .5):
 		for f in fileFeatVects:
 			x = np.array(f)
 			i += 1
-			score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], 1), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), nb_classes), verbose=0)
+			if windowed:
+				score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], x.shape[2]), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), nb_classes), verbose=0)
+			else:
+				score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], 1), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), nb_classes), verbose=0)
 			if score[1] > accThresh:
 				accSum += 1
 	return ((float)(accSum)) / i
