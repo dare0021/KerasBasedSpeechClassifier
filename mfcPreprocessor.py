@@ -18,6 +18,8 @@ explicit_Y_test = []
 
 testSpeakers = []
 
+# NOT A SETTING
+# Used by the code to store input to run()
 windowed = False
 
 def strToArr(input):
