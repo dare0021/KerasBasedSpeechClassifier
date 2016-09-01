@@ -5,7 +5,7 @@ import re
 import sys
 
 # automatically assigned unique speaker
-int uid = 999
+uid = 999
 
 def getUID():
 	global uid

@@ -154,7 +154,7 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 		model.add(Activation('relu'))
 		model.add(Convolution2D(nb_filters, filter_len, filter_len))
 		model.add(Activation('relu'))
-		model.add(MaxPooling2D(pool_size=(2,1)))
+		model.add(MaxPooling2D(pool_size=(2,2)))
 
 
 		model.add(Flatten())
