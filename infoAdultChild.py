@@ -5,12 +5,12 @@ import re
 import sys
 
 # automatically assigned unique speaker
-uid = 999
+# uid = 999
 
-def getUID():
-	global uid
-	uid += 1
-	return uid
+# def getUID():
+# 	global uid
+# 	uid += 1
+# 	return uid
 
 def regexMatch(pattern, string):
 	return bool(re.compile(pattern).match(string))
@@ -46,7 +46,12 @@ def getSpeakerID(path):
 	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", fileName):
 		return int(fileName[1:4])
 	elif "CSLU" in directory:
-		return getUID()
+		return fileName[2:5]
+		# should return 3 letters starting from the 3rd letter
+		# e.g. ks50b -> 50b
+		# check if compatible with the previous int only system
 	print "mfcPreprocessor.getSpeakerID() failed with input: ", path
 	sys.exit()
 	return -1
+
+# print getSpeakerID("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13k123/5/ks012/ks012xx0.wav.mfc") #012

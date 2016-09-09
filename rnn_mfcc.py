@@ -148,11 +148,16 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 		model = Sequential()
 
-		model.add(Convolution2D(nb_filters, filter_len, filter_len,
+		model.add(Convolution2D(nb_filters, 8, 8,
 		                        border_mode='valid',
 		                        input_shape=(1, X_train.shape[2], 1)))
 		model.add(Activation('relu'))
-		model.add(Convolution2D(nb_filters, filter_len, filter_len))
+		model.add(Dropout(0.2))
+		model.add(Convolution2D(nb_filters/8, 4, 4))
+		model.add(Dropout(0.2))
+		model.add(Activation('relu'))
+		model.add(Convolution2D(3, 2, 2))
+		model.add(Dropout(0.2))
 		model.add(Activation('relu'))
 		model.add(MaxPooling2D(pool_size=(2,2)))
 

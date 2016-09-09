@@ -3,10 +3,9 @@
 
 import re
 import sys
-import infoMaleFemale
-import infoAdultChild
 
-moduleToUse = infoMaleFemale
+import infoMaleFemale as moduleToUse
+# import infoAdultChild as moduleToUse
 
 # returns whether the file path is for a male or female speaker
 # 0: Male
