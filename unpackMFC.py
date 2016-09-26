@@ -1,7 +1,7 @@
 import numpy as np
 import struct
 
-windowSize = 100
+windowSize = 50
 
 # CMU Sphinx 4 mfc file opener
 # takes file path as input

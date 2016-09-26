@@ -22,36 +22,40 @@ def regexMatch(pattern, string):
 def getTruthValue(path):
 	if 'OnlySilences' in path:
 		return 2
-	path = path[path.rfind("/")+1:]
+	fileName = path[path.rfind("/")+1:]
+	directory = path[:path.rfind("/")]
 	# regex match increases running time by 3%
-	if regexMatch("C\d{3}_[MF]\d_(INDE|SENT)_\d{3}\.wav\.mfc", path):
+	if regexMatch("C\d{3}_[MF]\d_(INDE|SENT)_\d{3}\.wav\.mfc", fileName):
 		return 0
-	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", path):
+	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", fileName):
 		return 0
 	elif "CSLU" in directory:
 		return 1
-	print "mfcPreprocessor.getTruthValue() failed with input: ", path
+	print "infoAdultChild.getTruthValue() failed with input:", directory
 	sys.exit()
 	return -1
 
 # -1: Silences
 def getSpeakerID(path):
 	if 'OnlySilences' in path:
-		return -1
+		return '-1'
 	fileName = path[path.rfind("/")+1:]
 	directory = path[:path.rfind("/")]
 	# regex match increases running time by 3%
 	if regexMatch("C\d{3}_[MF]\d_(INDE|SENT)_\d{3}\.wav\.mfc", fileName):
-		return int(fileName[1:4])
+		return fileName[1:4]
 	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", fileName):
-		return int(fileName[1:4])
+		return fileName[1:4]
 	elif "CSLU" in directory:
 		return fileName[2:5]
-		# should return 3 letters starting from the 3rd letter
-		# e.g. ks50b -> 50b
-		# check if compatible with the previous int only system
-	print "mfcPreprocessor.getSpeakerID() failed with input: ", path
+	print "infoAdultChild.getSpeakerID() failed with input:", path
 	sys.exit()
 	return -1
+
+def getSIDKeyType():
+	return "string"
+
+# print getSpeakerID("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1NoSilences8.4e6/ks000010.wav.mfc")
+# print getSpeakerID("ks000010.wav.mfc")
 
 # print getSpeakerID("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13k123/5/ks012/ks012xx0.wav.mfc") #012

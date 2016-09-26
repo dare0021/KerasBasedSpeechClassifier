@@ -4,8 +4,8 @@
 import re
 import sys
 
-import infoMaleFemale as moduleToUse
-# import infoAdultChild as moduleToUse
+# import infoMaleFemale as moduleToUse
+import infoAdultChild as moduleToUse
 
 # returns whether the file path is for a male or female speaker
 # 0: Male
@@ -18,3 +18,7 @@ def getTruthValue(path):
 # -1: Silences
 def getSpeakerID(path):
 	return moduleToUse.getSpeakerID(path)
+
+# nparray only supports one type per array
+def getSIDKeyType():
+	return moduleToUse.getSIDKeyType()

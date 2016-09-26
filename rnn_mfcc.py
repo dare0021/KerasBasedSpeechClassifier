@@ -24,7 +24,7 @@ batch_size = 128
 # number of possible classes
 nb_classes = 3
 # how many iterations to run
-nb_epoch = 13
+nb_epoch = 10
 
 # ! adadelta (the default optimizer) has multiple learning rates which the algorithm tunes automatically
 # SGD Decay might result in worse performance
@@ -150,24 +150,18 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 		model.add(Convolution2D(nb_filters, 8, 8,
 		                        border_mode='valid',
-		                        input_shape=(1, X_train.shape[2], 1)))
-		model.add(Activation('relu'))
+		                        input_shape=(1, X_train.shape[2], 1),
+								activation='relu'))
 		model.add(Dropout(0.2))
-		model.add(Convolution2D(nb_filters/8, 4, 4))
+		model.add(Convolution2D(nb_filters/4, 6, 6, activation='relu'))
 		model.add(Dropout(0.2))
-		model.add(Activation('relu'))
-		model.add(Convolution2D(3, 2, 2))
-		model.add(Dropout(0.2))
-		model.add(Activation('relu'))
 		model.add(MaxPooling2D(pool_size=(2,2)))
 
 
 		model.add(Flatten())
-		model.add(Dense(256))
-		model.add(Activation('relu'))
+		model.add(Dense(256, activation='relu'))
 		model.add(Dropout(0.5))
-		model.add(Dense(nb_classes))
-		model.add(Activation('softmax'))
+		model.add(Dense(nb_classes, activation='softmax'))
 
 		optimizer = None
 		if decayLR > 0:

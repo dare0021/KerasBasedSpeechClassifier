@@ -10,7 +10,7 @@ fileDict = dict()
 # Things that are not from speakers
 # -1: Silences
 otherData = dict()
-otherDataKeys = [-1]
+otherDataKeys = []
 truthVals = dict()
 
 explicit_X_test = []
@@ -21,6 +21,16 @@ testSpeakers = []
 # NOT A SETTING
 # Used by the code to store input to run()
 windowed = False
+
+sidKeyType = sinfo.getSIDKeyType()
+if "int" == sidKeyType:
+	otherDataKeys = [-1]
+elif "string" == sidKeyType:
+	otherDataKeys = ['-1']
+else:
+	print "ERR: unknown speakerInfo.getSIDKeyType()", sidKeyType
+	import sys
+	sys.exit()
 
 def strToArr(input):
 	if type(input) is str:
@@ -109,7 +119,9 @@ def collateData(speakerList):
 			data = otherData[s]
 		else:
 			import sys
-			print "ERR: unknown speaker"
+			print "ERR: unknown speaker", s
+			print fileDict.keys()
+			print otherData.keys()
 			sys.exit()
 		for f in data:
 			x.extend(f)

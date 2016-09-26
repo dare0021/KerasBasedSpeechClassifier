@@ -243,7 +243,7 @@ def getTruthValue(path):
 			return 1
 		if comp == 376:
 			return 1
-	print "mfcPreprocessor.getTruthValue() failed with input: ", path
+	print "infoMaleFemale.getTruthValue() failed with input:", path
 	sys.exit()
 	return -1
 
@@ -257,6 +257,9 @@ def getSpeakerID(path):
 		return int(path[1:4])
 	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", path):
 		return int(path[1:4])
-	print "mfcPreprocessor.getSpeakerID() failed with input: ", path
+	print "infoMaleFemale.getSpeakerID() failed with input:", path
 	sys.exit()
 	return -1
+
+def getSIDKeyType():
+	return "int"
