@@ -38,6 +38,14 @@ momentumLR = 0.8
 # whether the input is a sequence of frames or a series of windows
 windowed = True
 
+# does not save if left empty
+saveWeightsTo = "weights"
+
+# =======================================================
+# Internal logic variables
+# NOT SETTINGS
+maxAccuracy = 0
+
 # input: Directory(ies) where the mfc files are in
 def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, explicitTestSet = None, windowedMode = windowed):
 	# for reproducibility
@@ -187,8 +195,15 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 		print('Time taken:', timeTaken)
 		print('Test score:', score[0])
 		print('Test accuracy:', score[1])
+		s = score[0]
+		acc = score[1]
 		if returnCustomEvalAccuracy:
+			s = -1
 			acc = evaluate(model)
 			print('Evaluator accuracy:', acc)
-			return (-1, acc, timeTaken)
-		return (score[0], score[1], timeTaken)
+		if len(saveWeightsTo) > 0 and maxAccuracy < acc:
+			maxAccuracy = acc
+			import os
+			model.save_weights(saveWeightsTo + "_" + acc + ".h5")
+
+		return (s, acc, timeTaken)
