@@ -24,7 +24,7 @@ batch_size = 128
 # number of possible classes
 nb_classes = 3
 # how many iterations to run
-nb_epoch = 10
+nb_epoch = 1
 
 # ! adadelta (the default optimizer) has multiple learning rates which the algorithm tunes automatically
 # SGD Decay might result in worse performance
@@ -89,6 +89,7 @@ def evaluate(model, accThresh = .5):
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
 def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 	global windowed
+	global maxAccuracy
 
 	if windowed:
 		X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
@@ -140,11 +141,18 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 		print('Time taken:', timeTaken)
 		print('Test score:', score[0])
 		print('Test accuracy:', score[1])
+		s = score[0]
+		acc = score[1]
 		if returnCustomEvalAccuracy:
+			s = -1
 			acc = evaluate(model)
 			print('Evaluator accuracy:', acc)
-			return (-1, acc, timeTaken)
-		return (score[0], score[1], timeTaken)
+		if len(saveWeightsTo) > 0 and maxAccuracy < acc:
+			maxAccuracy = acc
+			import os
+			model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5")
+
+		return (s, acc, timeTaken)
 
 	else:
 		X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
@@ -204,6 +212,6 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 		if len(saveWeightsTo) > 0 and maxAccuracy < acc:
 			maxAccuracy = acc
 			import os
-			model.save_weights(saveWeightsTo + "_" + acc + ".h5")
+			model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5")
 
 		return (s, acc, timeTaken)
