@@ -44,8 +44,7 @@ def run(input, output):
 	model = model_from_json(model)
 	model.load_weights(weightsFile)
 	model.compile(loss='categorical_crossentropy',
-	              optimizer='adadelta',
-	              metrics=['accuracy'])
+	              optimizer='adadelta')
 	genData = generateOutput(model, input)
 	saveGeneratedData(genData, ouput)
 

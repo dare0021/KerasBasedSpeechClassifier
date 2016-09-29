@@ -125,7 +125,9 @@ def run(inputDrop, flags):
 	if 'saveMaxVer' in flags and maxAccuracy < acc:
 		maxAccuracy = acc
 		import os
-		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5")
-		model.save(saveModelsTo + "_" + str(acc) + ".h5")
+		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
+		jsonData = model.to_json()
+		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
+			f.write(jsonData)
 
 	return (s, acc, timeTaken)
