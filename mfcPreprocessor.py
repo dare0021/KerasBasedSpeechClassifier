@@ -46,6 +46,7 @@ def loadTestSetAuto(rootPath, featureVectorSize):
 			explicit_Y_test.extend(np.full((len(data)), sinfo.getTruthValue(path), dtype='int8'))
 
 # rootPath is the string or an array of strings of paths of directories to use
+# Does not peek in to subdirectories
 # percentageThreshold is when to drop a feature vector by how much of it is zero
 # not implemented in this version
 # <1% drops for 0.7 

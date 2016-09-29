@@ -3,6 +3,7 @@ import mfcPreprocessor as mfcpp
 
 modelFile = ""
 weightsFile = ""
+# Does not check subdirectoreis
 input = ""
 output = ""
 
@@ -15,17 +16,9 @@ inputDrop = 0
 nb_classes = 3
 
 def generateOutput(model, parentDir):
-	outputData = []
-	for pname in listdir(parentDir):
-		if path.isdir(parentDir + pname):
-			outputThisIter = generateOutput(parentDir + pname + "/")
-			for vect in outputThisIter:
-				outputData.append(vect)
-		elif path.isfile(parentDir + pname) and pname.endswith(".mfc"):
-			mfcpp.run(input, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
-			X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, 1)
-			outputData.append(model.predict_proba(X_test))
-	return outputData
+	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, 1)
+	return model.predict_proba(X_test)
 
 def saveGeneratedData(data, path):
 	i = 1
