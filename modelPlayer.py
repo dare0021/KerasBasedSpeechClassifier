@@ -1,9 +1,18 @@
 from keras.models import model_from_json
+import mfcPreprocessor as mfcpp
 
 modelFile = ""
 weightsFile = ""
 input = ""
 output = ""
+
+unpredictableSeed = True
+percentageThreshold = 0.7
+featureVectorSize = 13
+explicitTestSet = None
+windowSize = 50
+inputDrop = 0
+nb_classes = 3
 
 def generateOutput(model, parentDir):
 	outputData = []
@@ -13,7 +22,9 @@ def generateOutput(model, parentDir):
 			for vect in outputThisIter:
 				outputData.append(vect)
 		elif path.isfile(parentDir + pname) and pname.endswith(".mfc"):
-			outputData.append(model.predict_proba(parentDir + pname))
+			mfcpp.run(input, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
+			X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, 1)
+			outputData.append(model.predict_proba(X_test))
 	return outputData
 
 def saveGeneratedData(data, path):
@@ -33,6 +44,8 @@ def saveGeneratedData(data, path):
 	print stringData
 
 def run(input, output):
+	if not unpredictableSeed:
+		np.random.seed(1337)
 	with open(modelFile, 'r') as f:
 		model = f.read()
 	model = model_from_json(model)
@@ -42,3 +55,5 @@ def run(input, output):
 	              metrics=['accuracy'])
 	genData = generateOutput(model, input)
 	saveGeneratedData(genData, ouput)
+
+run(input, output)

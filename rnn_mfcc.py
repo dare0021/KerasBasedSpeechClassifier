@@ -6,7 +6,6 @@ from keras.utils import np_utils
 import numpy as np
 import time
 import mfcPreprocessor as mfcpp
-import unpackMFC as umfc
 
 # Ratio of tests vs input. Training set is (1 - this) of the input.
 ratioOfTestsInInput = 0.1
