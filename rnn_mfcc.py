@@ -25,15 +25,8 @@ batch_size = 128
 nb_classes = 3
 # how many iterations to run
 nb_epoch = 10
-
-# ! adadelta (the default optimizer) has multiple learning rates which the algorithm tunes automatically
-# SGD Decay might result in worse performance
-
-# learning rate change momentum (if applicable)
-# example settings: 
-# nb_epoch=50, decayLR=0.1, momentumLR=0.8
-# nb_epoch=25, decayLR=0.01, momentumLR=0.9
-momentumLR = 0.8
+# how to bundle the MFCC vectors
+windowSize = 50
 
 saveMaxVer = False
 saveWeightsTo = "weights"
@@ -45,12 +38,12 @@ saveModelsTo = "model"
 maxAccuracy = 0
 
 # input: Directory(ies) where the mfc files are in
-def prepareDataSet(input, unpredictableSeed = False, featureVectorSize = 13, explicitTestSet = None):
+def prepareDataSet(input, unpredictableSeed, featureVectorSize, explicitTestSet):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
 
-	mfcpp.run(input, percentageThreshold = percentageThreshold, featureVectorSize = featureVectorSize, explicitTestSet = None)
+	mfcpp.run(input, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
 
 # Evaluation function for collating the files' various time steps' predictions
 # accThresh:	Files with accuracy above this are counted as correct
@@ -79,7 +72,7 @@ def evaluate(model, accThresh = .5):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
+def run(inputDrop, returnCustomEvalAccuracy):
 	global maxAccuracy
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
@@ -93,7 +86,7 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 
 	model.add(Convolution2D(nb_filters, filter_len, filter_len,
 	                        border_mode='valid',
-	                        input_shape=(1, umfc.windowSize, X_train.shape[3]),
+	                        input_shape=(1, windowSize, X_train.shape[3]),
 	                        activation='relu'))
 	model.add(Dropout(0.2))
 	model.add(Convolution2D(nb_filters, filter_len, filter_len, activation='relu'))
@@ -105,15 +98,8 @@ def run(inputDrop = 0, returnCustomEvalAccuracy = True, decayLR = 0):
 	model.add(Dropout(0.5))
 	model.add(Dense(nb_classes, activation='softmax'))
 
-	optimizer = None
-	if decayLR > 0:
-		from keras.optimizers import SGD
-		decay_rate = decayLR / nb_epoch
-		optimizer = SGD(lr=decayLR, momentum=momentumLR, decay=decay_rate, nesterov=True)
-	else:
-		optimizer = 'adadelta'
 	model.compile(loss='categorical_crossentropy',
-	              optimizer=optimizer,
+	              optimizer='adadelta',
 	              metrics=['accuracy'])
 
 	start = time.clock()

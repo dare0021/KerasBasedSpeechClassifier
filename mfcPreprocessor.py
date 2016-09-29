@@ -33,7 +33,7 @@ def strToArr(input):
 		return [input]
 	return input
 
-def loadTestSetAuto(rootPath, featureVectorSize = 13):
+def loadTestSetAuto(rootPath, featureVectorSize):
 	global explicit_X_test
 	global explicit_Y_test
 
@@ -41,7 +41,7 @@ def loadTestSetAuto(rootPath, featureVectorSize = 13):
 	for p in rootPath:
 		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
 		for path in filesThisPath:
-			data = unmfc.run(path, featureVectorSize = featureVectorSize)
+			data = unmfc.run(path, featureVectorSize)
 			explicit_X_test.append(data)
 			explicit_Y_test.extend(np.full((len(data)), sinfo.getTruthValue(path), dtype='int8'))
 
@@ -52,19 +52,17 @@ def loadTestSetAuto(rootPath, featureVectorSize = 13):
 # >20% for 0.6
 # Both of above for clean samples
 # explicitTestSet[0] contains paths, while explicitTestSet[1] contains truth values
-def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTestSet = None):
+def run(rootPath, percentageThreshold, featureVectorSize, explicitTestSet, windowSize):
 	global fileDict
 	global otherData
 	global truthVals
 	global explicit_X_test
 	global explicit_Y_test
 
-	unpackFunc = unmfc.returnWindowed
-
 	rootPath = strToArr(rootPath)
 	if explicitTestSet != None:
 		explicitTestSet = strToArr(explicitTestSet[0])
-		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize)
+		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize, True)
 		i = 0
 		for f in explicitTestSet:
 			explicit_X_test.extend(f)
@@ -79,7 +77,7 @@ def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTes
 		print fileCount, "files found so far."
 		for path in filesThisPath:
 			sid = sinfo.getSpeakerID(path)
-			data = unpackFunc(path, featureVectorSize = featureVectorSize)
+			data = unmfc.returnWindowed(path, featureVectorSize, windowSize)
 			if sid in fileDict:
 				fileDict[sid].append(data)
 			elif sid in otherData:

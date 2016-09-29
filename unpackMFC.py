@@ -1,8 +1,6 @@
 import numpy as np
 import struct
 
-windowSize = 50
-
 # CMU Sphinx 4 mfc file opener
 # takes file path as input
 # Sphinx uses feature vectors of length 13 by default
@@ -27,7 +25,7 @@ def run(input, featureVectorSize):
 # windowSize is in frames
 # a frame is 10ms
 # recommended value: 1~3 sec
-def returnWindowed(input, featureVectorSize, windowSize = windowSize):
+def returnWindowed(input, featureVectorSize, windowSize):
 	raw = run(input, featureVectorSize)
 	numcells = len(raw) // windowSize
 	if len(raw) % windowSize > 0:
@@ -36,7 +34,7 @@ def returnWindowed(input, featureVectorSize, windowSize = windowSize):
 	raw = np.append(raw, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(raw))))
 	return raw.reshape(numcells, windowSize, featureVectorSize)
 
-def runForAll(input, featureVectorSize, windowedMode = False):
+def runForAll(input, featureVectorSize, windowedMode):
 	out = []
 	if windowedMode:
 		for i in input:
