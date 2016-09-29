@@ -13,11 +13,7 @@ useFreshRngSeeds = True
 # 	Use rnn_mfcc.evaluate() instead of Keras built in accuracy metric
 # saveMaxVer
 # 	Save the best models & weights
-# generateOutput
-# 	Use rnn_mfcc.input() on the network to get model.predict_proba()
 flags = ['returnCustomEvalAccuracy', 'saveMaxVer']
-kvp = dict({'generateOutputPath':'somepath',\
-			'generateTo':'someOtherPath'})
 
 start = time.clock()
 

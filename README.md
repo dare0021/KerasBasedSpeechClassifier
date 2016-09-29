@@ -24,6 +24,8 @@ Or use rnn\_mfcc.py and rnn\_raw.py directly.
 
 	iv) Run via boot.py or rnn\_mfcc.py directly.
 
+	modelPlayer.py can be used to play with saved models
+
 2) Raw wav data approach
 
 This branch is currently not working. (Results similar to random guessing.)

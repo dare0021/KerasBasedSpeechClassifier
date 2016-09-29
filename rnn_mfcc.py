@@ -47,33 +47,6 @@ def prepareDataSet(input, unpredictableSeed, featureVectorSize, explicitTestSet)
 
 	mfcpp.run(input, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
 
-def generateOutput(model, parentDir):
-	outputData = []
-	for pname in listdir(parentDir):
-		if path.isdir(parentDir + pname):
-			outputThisIter = generateOutput(parentDir + pname + "/")
-			for vect in outputThisIter:
-				outputData.append(vect)
-		elif path.isfile(parentDir + pname) and pname.endswith(".mfc"):
-			outputData.append(model.predict_proba(parentDir + pname))
-	return outputData
-
-def saveGeneratedData(data, path):
-	i = 1
-	while path.isfile(path):
-		path = path[:len(path)-len(str(i))] + str(i)
-		i += 1
-	stringData = time.asctime() + "\n"
-	for vect in data:
-		stringData += "[ "
-		for prob in vect:
-			stringData += str(prob) + ", "
-		stringData = stringData[:len(stringData)-2]
-		stringData += "]\n"
-	with open(path, 'w') as f:
-		f.write(stringData)
-	print stringData
-
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):
 	testSpeakers = mfcpp.testSpeakers
@@ -99,7 +72,7 @@ def evaluate(model, accThresh):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop, flags, kvp):
+def run(inputDrop, flags):
 	global maxAccuracy
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
@@ -144,9 +117,6 @@ def run(inputDrop, flags, kvp):
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
 
-	if 'generateOutput' in flags:
-		genData = generateOutput(kvp['generateOutputPath'])
-		saveGeneratedData(genData, kvp['generateTo'])
 	s = score[0]
 	acc = score[1]
 	if 'returnCustomEvalAccuracy' in flags:
