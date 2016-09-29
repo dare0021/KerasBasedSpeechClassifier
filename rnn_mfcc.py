@@ -27,6 +27,9 @@ nb_classes = 3
 nb_epoch = 10
 # how to bundle the MFCC vectors
 windowSize = 50
+# Files with accuracy above this are counted as correct
+# 	Manually set due to the otherGroup messing with it
+evaluateAccuracy = 0.5
 
 saveWeightsTo = "weights"
 saveModelsTo = "model"
@@ -44,10 +47,35 @@ def prepareDataSet(input, unpredictableSeed, featureVectorSize, explicitTestSet)
 
 	mfcpp.run(input, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
 
+def generateOutput(model, parentDir):
+	outputData = []
+	for pname in listdir(parentDir):
+		if path.isdir(parentDir + pname):
+			outputThisIter = generateOutput(parentDir + pname + "/")
+			for vect in outputThisIter:
+				outputData.append(vect)
+		elif path.isfile(parentDir + pname) and pname.endswith(".mfc"):
+			outputData.append(model.predict_proba(parentDir + pname))
+	return outputData
+
+def saveGeneratedData(data, path):
+	i = 1
+	while path.isfile(path):
+		path = path[:len(path)-len(str(i))] + str(i)
+		i += 1
+	stringData = time.asctime() + "\n"
+	for vect in data:
+		stringData += "[ "
+		for prob in vect:
+			stringData += str(prob) + ", "
+		stringData = stringData[:len(stringData)-2]
+		stringData += "]\n"
+	with open(path, 'w') as f:
+		f.write(stringData)
+	print stringData
+
 # Evaluation function for collating the files' various time steps' predictions
-# accThresh:	Files with accuracy above this are counted as correct
-# 				Manually set due to the otherGroup messing with it
-def evaluate(model, accThresh = .5):
+def evaluate(model, accThresh):
 	testSpeakers = mfcpp.testSpeakers
 	accSum = 0
 	i = 0
@@ -71,7 +99,7 @@ def evaluate(model, accThresh = .5):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop, flags):
+def run(inputDrop, flags, kvp):
 	global maxAccuracy
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
@@ -117,12 +145,13 @@ def run(inputDrop, flags):
 	print('Test accuracy:', score[1])
 
 	if 'generateOutput' in flags:
-
+		genData = generateOutput(kvp['generateOutputPath'])
+		saveGeneratedData(genData, kvp['generateTo'])
 	s = score[0]
 	acc = score[1]
 	if 'returnCustomEvalAccuracy' in flags:
 		s = -1
-		acc = evaluate(model)
+		acc = evaluate(model, evaluateAccuracy)
 		print('Evaluator accuracy:', acc)
 	if 'saveMaxVer' in flags and maxAccuracy < acc:
 		maxAccuracy = acc

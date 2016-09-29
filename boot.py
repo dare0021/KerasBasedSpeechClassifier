@@ -15,7 +15,9 @@ useFreshRngSeeds = True
 # 	Save the best models & weights
 # generateOutput
 # 	Use rnn_mfcc.input() on the network to get model.predict_proba()
-flags = ['returnCustomEvalAccuracy', 'generateOutput', 'saveMaxVer']
+flags = ['returnCustomEvalAccuracy', 'saveMaxVer']
+kvp = dict({'generateOutputPath':'somepath',\
+			'generateTo':'someOtherPath'})
 
 start = time.clock()
 
@@ -35,7 +37,7 @@ for i in range(numIterations):
 	print "Starting iteration: ", i+1, " / ", numIterations
 	print "___________________________"
 	# All .mfc files should be present in the directory given using the parameter "input"
-	score = rnn_mfcc.run(0, flags)
+	score = rnn_mfcc.run(0, flags, kvp)
 	# input is hard coded in to preprocessor.py
 	# score = rnn_raw.run(unpredictableSeed = useFreshRngSeeds)
 	if avgTime < 0:
@@ -52,5 +54,3 @@ print "Total iime taken:\t", time.clock() - start
 print "Average time taken:\t", avgTime/numIterations
 print "Average score:\t", avgScore/numIterations
 print "Average accuracy:\t", avgAcc/numIterations
-
-# TODO: Fiddle around with the ANN settings & EnergyFilter thresh
