@@ -34,11 +34,11 @@ def returnWindowed(input, featureVectorSize, windowSize):
 	raw = np.append(raw, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(raw))))
 	return raw.reshape(numcells, windowSize, featureVectorSize)
 
-def runForAll(input, featureVectorSize, windowedMode):
+def runForAll(input, featureVectorSize, windowSize):
 	out = []
-	if windowedMode:
+	if windowSize > 1:
 		for i in input:
-			out.append(returnWindowed(i, featureVectorSize))
+			out.append(returnWindowed(i, featureVectorSize, windowSize))
 	else:
 		for i in input:
 			out.append(run(i, featureVectorSize))

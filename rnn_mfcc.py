@@ -28,7 +28,6 @@ nb_epoch = 10
 # how to bundle the MFCC vectors
 windowSize = 50
 
-saveMaxVer = False
 saveWeightsTo = "weights"
 saveModelsTo = "model"
 
@@ -72,7 +71,7 @@ def evaluate(model, accThresh = .5):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop, returnCustomEvalAccuracy):
+def run(inputDrop, flags):
 	global maxAccuracy
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
@@ -108,6 +107,7 @@ def run(inputDrop, returnCustomEvalAccuracy):
 	# Verbose 2: Output each epoch
 	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
 	          verbose=2, validation_data=(X_test, Y_test))
+	score = [0, 0]
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
 	timeTaken = time.clock() - start
@@ -115,13 +115,16 @@ def run(inputDrop, returnCustomEvalAccuracy):
 	print('Time taken:', timeTaken)
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
+
+	if 'generateOutput' in flags:
+
 	s = score[0]
 	acc = score[1]
-	if returnCustomEvalAccuracy:
+	if 'returnCustomEvalAccuracy' in flags:
 		s = -1
 		acc = evaluate(model)
 		print('Evaluator accuracy:', acc)
-	if saveMaxVer and maxAccuracy < acc:
+	if 'saveMaxVer' in flags and maxAccuracy < acc:
 		maxAccuracy = acc
 		import os
 		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5")

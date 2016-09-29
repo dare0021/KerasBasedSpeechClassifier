@@ -8,6 +8,15 @@ numIterations = 2
 # If false will use seed "1337" instead of current time
 useFreshRngSeeds = True
 
+# possible flags:
+# returnCustomEvalAccuracy
+# 	Use rnn_mfcc.evaluate() instead of Keras built in accuracy metric
+# saveMaxVer
+# 	Save the best models & weights
+# generateOutput
+# 	Use rnn_mfcc.input() on the network to get model.predict_proba()
+flags = ['returnCustomEvalAccuracy', 'generateOutput', 'saveMaxVer']
+
 start = time.clock()
 
 avgTime = -1
@@ -26,7 +35,7 @@ for i in range(numIterations):
 	print "Starting iteration: ", i+1, " / ", numIterations
 	print "___________________________"
 	# All .mfc files should be present in the directory given using the parameter "input"
-	score = rnn_mfcc.run(0, True)
+	score = rnn_mfcc.run(0, flags)
 	# input is hard coded in to preprocessor.py
 	# score = rnn_raw.run(unpredictableSeed = useFreshRngSeeds)
 	if avgTime < 0:

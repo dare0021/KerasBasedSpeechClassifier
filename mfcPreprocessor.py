@@ -62,7 +62,7 @@ def run(rootPath, percentageThreshold, featureVectorSize, explicitTestSet, windo
 	rootPath = strToArr(rootPath)
 	if explicitTestSet != None:
 		explicitTestSet = strToArr(explicitTestSet[0])
-		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize, True)
+		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize, windowSize)
 		i = 0
 		for f in explicitTestSet:
 			explicit_X_test.extend(f)
