@@ -18,10 +18,6 @@ explicit_Y_test = []
 
 testSpeakers = []
 
-# NOT A SETTING
-# Used by the code to store input to run()
-windowed = False
-
 sidKeyType = sinfo.getSIDKeyType()
 if "int" == sidKeyType:
 	otherDataKeys = [-1]
@@ -56,24 +52,19 @@ def loadTestSetAuto(rootPath, featureVectorSize = 13):
 # >20% for 0.6
 # Both of above for clean samples
 # explicitTestSet[0] contains paths, while explicitTestSet[1] contains truth values
-def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTestSet = None, windowedMode = windowed):
+def run(rootPath, percentageThreshold = 0.7, featureVectorSize = 13, explicitTestSet = None):
 	global fileDict
 	global otherData
 	global truthVals
 	global explicit_X_test
 	global explicit_Y_test
-	global windowed
 
-	windowed = windowedMode
-	if windowedMode:
-		unpackFunc = unmfc.returnWindowed
-	else:
-		unpackFunc = unmfc.run
+	unpackFunc = unmfc.returnWindowed
 
 	rootPath = strToArr(rootPath)
 	if explicitTestSet != None:
 		explicitTestSet = strToArr(explicitTestSet[0])
-		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize, windowedMode)
+		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize)
 		i = 0
 		for f in explicitTestSet:
 			explicit_X_test.extend(f)
@@ -193,12 +184,8 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		X_train = np.array(X_train, dtype='float32')
 		X_test = np.array(explicit_X_test, dtype='float32')
 
-	if windowed:
-		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], X_train.shape[2])
-		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], X_test.shape[2])
-	else:
-		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], 1)
-		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], 1)
+	X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], X_train.shape[2])
+	X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], X_test.shape[2])
 
 	print "Training set:", speakersTrain
 	print "Testing  set:", speakersTest
@@ -207,7 +194,7 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 
 
 # for unit test
-# run("../SPK_DB/mfc13", windowedMode = True)
+# run("../SPK_DB/mfc13")
 # for x in fileDict[1]:
 # 	print np.array(x).shape
 # run("../SPK_DB/mfc60", featureVectorSize=60)
