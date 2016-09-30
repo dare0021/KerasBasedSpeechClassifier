@@ -22,7 +22,6 @@ featureVectorSize = 13
 explicitTestSet = None
 windowSize = 50
 inputDrop = 0
-nb_classes = 3
 
 # ====================================
 # Internal logic variables
@@ -31,7 +30,7 @@ sumTotal = 0
 
 def generateOutput(model, parentDir):
 	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
-	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, 1)
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, 1)
 	return model.predict_proba(X_test)
 
 def saveGeneratedData(data, path):

@@ -125,7 +125,7 @@ def collateData(speakerList):
 # dropout:	ratio of the superset to disregard
 # dropout is done here to make sure the np.array generated is not bigger than it has to be
 # since using Keras dropout would mean feeding everything in to the ANN
-def getSubset(nb_classes, dropout, ratioOfTestsInInput):
+def getSubset(dropout, ratioOfTestsInInput):
 	global fileDict
 	global otherData
 	global truthVals
@@ -165,8 +165,8 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		X_train, Y_train = collateData(speakersTrain)
 		X_test, Y_test = collateData(speakersTest)
 
-		Y_train = np_utils.to_categorical(Y_train, nb_classes)
-		Y_test = np_utils.to_categorical(Y_test, nb_classes)
+		Y_train = np_utils.to_categorical(Y_train, sinfo.getNbClasses())
+		Y_test = np_utils.to_categorical(Y_test, sinfo.getNbClasses())
 
 		X_train = np.array(X_train, dtype='float32')
 		X_test = np.array(X_test, dtype='float32')
@@ -181,8 +181,8 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		speakersTrain = np.append(speakersTrain, otherGroup)
 		X_train, Y_train = collateData(speakerList)
 
-		Y_train = np_utils.to_categorical(Y_train, nb_classes)
-		Y_test = np_utils.to_categorical(explicit_Y_test, nb_classes)
+		Y_train = np_utils.to_categorical(Y_train, sinfo.getNbClasses())
+		Y_test = np_utils.to_categorical(explicit_Y_test, sinfo.getNbClasses())
 
 		X_train = np.array(X_train, dtype='float32')
 		X_test = np.array(explicit_X_test, dtype='float32')

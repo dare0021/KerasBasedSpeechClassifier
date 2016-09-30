@@ -22,3 +22,6 @@ def getSpeakerID(path):
 # nparray only supports one type per array
 def getSIDKeyType():
 	return moduleToUse.getSIDKeyType()
+
+def getNbClasses():
+	return moduleToUse.getNbClasses()

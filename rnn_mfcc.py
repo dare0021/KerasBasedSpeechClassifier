@@ -6,6 +6,7 @@ from keras.utils import np_utils
 import numpy as np
 import time
 import mfcPreprocessor as mfcpp
+import speakerInfo as sinfo
 
 # Ratio of tests vs input. Training set is (1 - this) of the input.
 ratioOfTestsInInput = 0.1
@@ -20,8 +21,6 @@ filter_len = 3
 
 # number of samples before weight update
 batch_size = 128
-# number of possible classes
-nb_classes = 3
 # how many iterations to run
 nb_epoch = 10
 # how to bundle the MFCC vectors
@@ -57,7 +56,7 @@ def evaluate(model, accThresh):
 		for f in fileFeatVects:
 			x = np.array(f)
 			i += 1
-			score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], x.shape[2]), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), nb_classes), verbose=0)
+			score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], x.shape[2]), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), sinfo.getNbClasses()), verbose=0)
 			if score[1] > accThresh:
 				accSum += 1
 	return ((float)(accSum)) / i
@@ -74,7 +73,7 @@ def evaluate(model, accThresh):
 def run(inputDrop, flags):
 	global maxAccuracy
 
-	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, ratioOfTestsInInput)
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
 
 	print "X_train", X_train.shape
 	print "Y_train", Y_train.shape
@@ -93,7 +92,7 @@ def run(inputDrop, flags):
 	model.add(Flatten())
 	model.add(Dense(256, activation='relu'))
 	model.add(Dropout(0.5))
-	model.add(Dense(nb_classes, activation='softmax'))
+	model.add(Dense(sinfo.getNbClasses(), activation='softmax'))
 
 	model.compile(loss='categorical_crossentropy',
 	              optimizer='adadelta',

@@ -55,6 +55,9 @@ def getSpeakerID(path):
 def getSIDKeyType():
 	return "string"
 
+def getNbClasses():
+	return 3
+
 # print getSpeakerID("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1NoSilences8.4e6/ks000010.wav.mfc")
 # print getSpeakerID("ks000010.wav.mfc")
 

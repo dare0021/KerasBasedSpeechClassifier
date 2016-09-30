@@ -263,3 +263,6 @@ def getSpeakerID(path):
 
 def getSIDKeyType():
 	return "int"
+
+def getNbClasses():
+	return 3
