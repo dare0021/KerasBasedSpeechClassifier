@@ -1,12 +1,20 @@
+# Takes a bunch of MFCC files from a single class, then puts them through
+# a saved Keras model / weight combo
+
 from keras.models import model_from_json
-import mfcPreprocessor as mfcpp
+import numpy as np
 import os, time
+
+import mfcPreprocessor as mfcpp
 
 modelFile = "saveData/model_0.959481361426.json"
 weightsFile = "saveData/weights_0.959481361426.h5"
 # Does not check subdirectoreis
 input = "inputData"
 output = "saveData/output_0.959481361426.txt"
+
+# The ground truth value
+targetClass = 0
 
 unpredictableSeed = True
 percentageThreshold = 0.7
@@ -16,23 +24,37 @@ windowSize = 50
 inputDrop = 0
 nb_classes = 3
 
+# ====================================
+# Internal logic variables
+sumCorrect = 0
+sumTotal = 0
+
 def generateOutput(model, parentDir):
 	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(nb_classes, inputDrop, 1)
 	return model.predict_proba(X_test)
 
 def saveGeneratedData(data, path):
+	global sumCorrect, sumTotal
+
 	i = 1
 	while os.path.isfile(path):
 		path = path[:len(path)-len(str(i))] + str(i)
 		i += 1
 	stringData = time.asctime() + "\n"
+	listTargetProb = []
 	for vect in data:
+		cls = np.argmax(vect)
+		if cls == targetClass:
+			sumCorrect += 1
+		sumTotal += 1
 		stringData += "[ "
 		for prob in vect:
 			stringData += str(prob) + ", "
 		stringData = stringData[:len(stringData)-2]
-		stringData += "]\n"
+		stringData += "] " + str(cls) + "\n"
+	acc = ((float)(sumCorrect)) / sumTotal
+	stringData += "Accuracy: " + str(acc) + " (" + str(sumCorrect) + " / " + str(sumTotal) + ")\n"
 	with open(path, 'w') as f:
 		f.write(stringData)
 	print stringData
