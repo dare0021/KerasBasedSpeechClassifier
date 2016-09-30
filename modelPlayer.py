@@ -11,10 +11,10 @@ modelFile = "saveData/model_0.959481361426.json"
 weightsFile = "saveData/weights_0.959481361426.h5"
 # Does not check subdirectoreis
 input = "inputData"
-output = "saveData/output_0.959481361426.txt"
+output = "saveData/10mC_0.959481361426.txt"
 
 # The ground truth value
-targetClass = 0
+targetClass = 1
 
 unpredictableSeed = True
 percentageThreshold = 0.7
@@ -27,6 +27,11 @@ inputDrop = 0
 # Internal logic variables
 sumCorrect = 0
 sumTotal = 0
+
+def evaluate(vect):
+	if vect[0] > vect[1]:
+		return 0
+	return 1
 
 def generateOutput(model, parentDir):
 	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
@@ -43,7 +48,7 @@ def saveGeneratedData(data, path):
 	stringData = time.asctime() + "\n"
 	listTargetProb = []
 	for vect in data:
-		cls = np.argmax(vect)
+		cls = evaluate(vect)
 		if cls == targetClass:
 			sumCorrect += 1
 		sumTotal += 1
