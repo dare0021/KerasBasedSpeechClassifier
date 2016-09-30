@@ -1,11 +1,12 @@
 from keras.models import model_from_json
 import mfcPreprocessor as mfcpp
+import os, time
 
-modelFile = ""
-weightsFile = ""
+modelFile = "saveData/model_0.959481361426.json"
+weightsFile = "saveData/weights_0.959481361426.h5"
 # Does not check subdirectoreis
-input = ""
-output = ""
+input = "inputData"
+output = "saveData/output_0.959481361426.txt"
 
 unpredictableSeed = True
 percentageThreshold = 0.7
@@ -22,7 +23,7 @@ def generateOutput(model, parentDir):
 
 def saveGeneratedData(data, path):
 	i = 1
-	while path.isfile(path):
+	while os.path.isfile(path):
 		path = path[:len(path)-len(str(i))] + str(i)
 		i += 1
 	stringData = time.asctime() + "\n"
@@ -46,6 +47,6 @@ def run(input, output):
 	model.compile(loss='categorical_crossentropy',
 	              optimizer='adadelta')
 	genData = generateOutput(model, input)
-	saveGeneratedData(genData, ouput)
+	saveGeneratedData(genData, output)
 
 run(input, output)

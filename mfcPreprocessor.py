@@ -144,15 +144,18 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 
 	# create X & Y sets
 		# X set should be [None, 1, freq, 1]
-		# TODO: use a 2D set of mfcc data instead of single time steps
 		# Y set should be [None, 1] and match the X set in cardinality
 
 	# Auto
 	if len(explicit_Y_test) <= 0:
+		print 'auto getSubset()'
 		speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
 		np.random.shuffle(speakerList)
 
-		trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
+		if ratioOfTestsInInput == 1:
+			trainListSize = 0
+		else:
+			trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
 		speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
 		testSpeakers = speakersTest
 
@@ -169,6 +172,7 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		X_test = np.array(X_test, dtype='float32')
 	# Manual explicit test group
 	else:
+		print 'explicit manual test set'
 		speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
 		np.random.shuffle(speakerList)
 
@@ -183,8 +187,14 @@ def getSubset(nb_classes, dropout, ratioOfTestsInInput):
 		X_train = np.array(X_train, dtype='float32')
 		X_test = np.array(explicit_X_test, dtype='float32')
 
-	X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], X_train.shape[2])
-	X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], X_test.shape[2])
+	if X_train.shape[0] > 0:
+		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], X_train.shape[2])
+	else:
+		print 'WARN: X_train.shape[0] <= 0', X_train.shape
+	if X_test.shape[0] > 0:
+		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], X_test.shape[2])
+	else:
+		print 'WARN: X_test.shape[0] <= 0', X_test.shape
 
 	print "Training set:", speakersTrain
 	print "Testing  set:", speakersTest
