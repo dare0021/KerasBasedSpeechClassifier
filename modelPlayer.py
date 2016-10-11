@@ -7,11 +7,11 @@ import os, time
 
 import mfcPreprocessor as mfcpp
 
-modelFile = "saveData/model_0.959481361426.json"
-weightsFile = "saveData/weights_0.959481361426.h5"
+modelFile = "saveData_0.5Drop/model_0.999343508945.json"
+weightsFile = "saveData_0.5Drop/weights_0.999343508945.h5"
 # Does not check subdirectoreis
-input = "inputData"
-output = "saveData/10mC_0.959481361426.txt"
+input = "inputData/C"
+output = "saveData_0.5Drop/10mC_0.999343508945.txt"
 
 # The ground truth value
 targetClass = 1

@@ -36,6 +36,7 @@ saveModelsTo = "model"
 # Internal logic variables
 # NOT SETTINGS
 maxAccuracy = 0
+onlySaveBestOnes = False;
 
 # input: Directory(ies) where the mfc files are in
 def prepareDataSet(input, unpredictableSeed, featureVectorSize, explicitTestSet):
@@ -86,7 +87,9 @@ def run(inputDrop, flags):
 	                        border_mode='valid',
 	                        input_shape=(1, windowSize, X_train.shape[3]),
 	                        activation='relu'))
+	model.add(Dropout(0.3))
 	model.add(Convolution2D(nb_filters, filter_len, filter_len, activation='relu'))
+	model.add(Dropout(0.3))
 	model.add(MaxPooling2D(pool_size=(2,2)))
 
 	model.add(Flatten())
@@ -119,8 +122,9 @@ def run(inputDrop, flags):
 		s = -1
 		acc = evaluate(model, evaluateAccuracy)
 		print('Evaluator accuracy:', acc)
-	if 'saveMaxVer' in flags and maxAccuracy < acc:
-		maxAccuracy = acc
+	if 'saveMaxVer' in flags and ((not onlySaveBestOnes) or maxAccuracy < acc):
+		if maxAccuracy < acc:
+			maxAccuracy = acc
 		import os
 		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
 		jsonData = model.to_json()
