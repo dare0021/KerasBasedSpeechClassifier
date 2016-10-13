@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60A_dither.txt"
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60C_dither.txt"
 
-input = cj60ba
-target = 0
+input = cj60bc
+target = 1
 
 data = []
 dataMax = []
@@ -78,8 +78,23 @@ def getRawGraph(nb_classes, savePath = "", verbose = True):
 	else:
 		plt.show()
 
+def getStats(verbose = True):
+	npcopy = np.array(data)
+	stddev = np.std(npcopy, axis = 0)
+	mean = np.mean(npcopy, axis = 0)
+	median = np.median(npcopy, axis = 0)
+	if verbose:
+		print "stddev"
+		print stddev
+		print "mean"
+		print mean
+		print "median"
+		print median
+	return stddev, mean, median
+
 readData(input)
 getAccuracy("ignore silence", target)
 getAccuracy("silence drop", target)
 getAccuracy("strictly no silence", target)
-getRawGraph(3)
+getStats()
+# getRawGraph(3)
