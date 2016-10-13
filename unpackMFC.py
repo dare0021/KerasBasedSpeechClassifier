@@ -20,8 +20,8 @@ def run(input, featureVectorSize):
 		out[i//featureVectorSize][i%featureVectorSize] = struct.unpack('>f', ''.join(file.read(4)))[0]
 	return out
 
-# Returns windowed result
-# e.g. for frames 1,2,3,4,5: [[1,2,3], [2,3,4], [3,4,5]]
+# Returns windowed result with 0 padding
+# e.g. for frames 1,2,3,4,5: [[1,2,3], [4,5,0]]
 # windowSize is in frames
 # a frame is 10ms
 # recommended value: 1~3 sec

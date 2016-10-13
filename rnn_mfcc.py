@@ -87,9 +87,9 @@ def run(inputDrop, flags):
 	                        border_mode='valid',
 	                        input_shape=(1, windowSize, X_train.shape[3]),
 	                        activation='relu'))
-	model.add(Dropout(0.3))
+	model.add(Dropout(0.1))
 	model.add(Convolution2D(nb_filters, filter_len, filter_len, activation='relu'))
-	model.add(Dropout(0.3))
+	model.add(Dropout(0.1))
 	model.add(MaxPooling2D(pool_size=(2,2)))
 
 	model.add(Flatten())
