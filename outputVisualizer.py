@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60A_dither.txt"
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60C_dither.txt"
 
-input = cj60bc
-target = 1
+input = cj60ba
+target = 0
 # 1 frame is 10ms
 windowSize = 100
 
@@ -46,9 +46,22 @@ def getSlidingWindowModes(windowSize):
 		datalet.pop(0)
 		datalet.append(dataMax[i])
 		modes.append(stats.mode(datalet)[0][0])
-	print "modes"
-	print modes
+	print "modes", modes
 	return modes
+
+# stride set to 1
+def getSlidingWindowAverages(windowSize):
+	assert windowSize <= len(dataMax)
+	averages = []
+	nb_windows = len(data) - windowSize + 1
+	datalet = data[:windowSize]
+	averages.append(np.mean(datalet, axis=0))
+	for i in range(1, nb_windows):
+		datalet.pop(0)
+		datalet.append(data[i])
+		averages.append(np.mean(datalet, axis=0))
+	print "averages", averages
+	return averages
 
 def getSlidingWindowModeAccuracy(windowSize, target):
 	modes = getSlidingWindowModes(windowSize)
@@ -58,6 +71,15 @@ def getSlidingWindowModeAccuracy(windowSize, target):
 			sum += 1
 	print "SlidingWindow Mode Accuracy", sum, '/', len(modes),'=',sum/len(modes)
 	return sum / len(modes)
+
+def getSlidingWindowAverageAccuracy(windowSize, target):
+	averages = getSlidingWindowAverages(windowSize)
+	sum = 0.0
+	for iter in averages:
+		if np.argmax(iter) == target:
+			sum += 1
+	print "SlidingWindow Average Accuracy", sum, '/', len(averages), '=', sum/len(averages)
+	return sum / len(averages)
 
 def getAccuracy(silentTreatment, target):
 	global dataMax
@@ -125,4 +147,5 @@ getAccuracy("silence drop", target)
 getAccuracy("strictly no silence", target)
 getStats()
 getSlidingWindowModeAccuracy(windowSize, target)
+getSlidingWindowAverageAccuracy(windowSize, target)
 # getRawGraph(3)
