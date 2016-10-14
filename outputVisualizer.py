@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
@@ -5,8 +8,8 @@ import matplotlib.pyplot as plt
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60A_dither.txt"
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60C_dither.txt"
 
-input = cj60ba
-target = 0
+input = cj60bc
+target = 1
 # 1 frame is 10ms
 windowSize = 100
 
@@ -37,6 +40,7 @@ def getMax(nb_classes):
 
 # stride set to 1
 def getSlidingWindowModes(windowSize):
+	global dataMax
 	assert windowSize <= len(dataMax)
 	modes = []
 	nb_windows = len(dataMax) - windowSize + 1
@@ -51,7 +55,8 @@ def getSlidingWindowModes(windowSize):
 
 # stride set to 1
 def getSlidingWindowAverages(windowSize):
-	assert windowSize <= len(dataMax)
+	global data
+	assert windowSize <= len(data)
 	averages = []
 	nb_windows = len(data) - windowSize + 1
 	datalet = data[:windowSize]
@@ -81,8 +86,18 @@ def getSlidingWindowAverageAccuracy(windowSize, target):
 	print "SlidingWindow Average Accuracy", sum, '/', len(averages), '=', sum/len(averages)
 	return sum / len(averages)
 
+# gets the delta confidence between the target class and the max confidence class
+def getConfidenceDifferential(target):
+	global data
+	retval = []
+	for iter in data:
+		retval.append(iter[target] - np.max(iter))
+	print 'ConfidenceΔ', retval
+	print 'ConfidenceΔσ', np.std(retval)
+	return retval
+
 def getAccuracy(silentTreatment, target):
-	global dataMax
+	global data
 	sum = 0.0
 	total = len(data)
 	if silentTreatment == "ignore silence":
@@ -133,12 +148,9 @@ def getStats(verbose = True):
 	mean = np.mean(npcopy, axis = 0)
 	median = np.median(npcopy, axis = 0)
 	if verbose:
-		print "stddev"
-		print stddev
-		print "mean"
-		print mean
-		print "median"
-		print median
+		print "stddev", stddev
+		print "mean", mean
+		print "median", median
 	return stddev, mean, median
 
 readData(input)
@@ -148,4 +160,5 @@ getAccuracy("strictly no silence", target)
 getStats()
 getSlidingWindowModeAccuracy(windowSize, target)
 getSlidingWindowAverageAccuracy(windowSize, target)
+getConfidenceDifferential(target)
 # getRawGraph(3)
