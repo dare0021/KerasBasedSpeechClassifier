@@ -53,7 +53,7 @@ def generateFileList(rootPath):
 def readFile(input, framesPerItem):
 	if not wo.open(input):
 		print "Failed to open ", input
-		sys.exit()
+		assert False
 	bytarr = wo.read(nearZeroThreshold = 0.00).astype(float) / INT_MAX
 	frames = np.size(bytarr) // framesPerItem
 	if frames < (float)(np.size(bytarr)) / framesPerItem:
@@ -64,7 +64,7 @@ def readFile(input, framesPerItem):
 def getFramerate(input):
 	if not wo.open(input):
 		print "Failed to open ", input
-		sys.exit()
+		assert False
 	return wo.getFramerate()
 
 def fpschk(files):
@@ -73,7 +73,7 @@ def fpschk(files):
 		if fps == -1:
 			fps = getFramerate(i)
 		elif fps != getFramerate(i):
-			sys.exit()
+			assert False
 	print "FPS OK"
 	print "FPS: ", fps
 	return fps

@@ -2,7 +2,6 @@
 # Separated out since 1) it's long, and 2) the code should change according to what files are used
 
 import re
-import sys
 
 def regexMatch(pattern, string):
 	return bool(re.compile(pattern).match(string))
@@ -244,7 +243,7 @@ def getTruthValue(path):
 		if comp == 376:
 			return 1
 	print "infoMaleFemale.getTruthValue() failed with input:", path
-	sys.exit()
+	assert False
 	return -1
 
 # -1: Silences
@@ -258,7 +257,7 @@ def getSpeakerID(path):
 	elif regexMatch("p\d{3}_\d{3}\.wav\.mfc", path):
 		return int(path[1:4])
 	print "infoMaleFemale.getSpeakerID() failed with input:", path
-	sys.exit()
+	assert False
 	return -1
 
 def getSIDKeyType():

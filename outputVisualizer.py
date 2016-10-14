@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import stats
 import matplotlib.pyplot as plt
 
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60A_dither.txt"
@@ -6,6 +7,8 @@ cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60C_
 
 input = cj60bc
 target = 1
+# 1 frame is 10ms
+windowSize = 100
 
 data = []
 dataMax = []
@@ -32,6 +35,30 @@ def getMax(nb_classes):
 	for arr in data:
 		dataMax.append(np.argmax(arr[:nb_classes]))
 
+# stride set to 1
+def getSlidingWindowModes(windowSize):
+	assert windowSize <= len(dataMax)
+	modes = []
+	nb_windows = len(dataMax) - windowSize + 1
+	datalet = dataMax[:windowSize]
+	modes.append(stats.mode(datalet)[0][0])
+	for i in range(1, nb_windows):
+		datalet.pop(0)
+		datalet.append(dataMax[i])
+		modes.append(stats.mode(datalet)[0][0])
+	print "modes"
+	print modes
+	return modes
+
+def getSlidingWindowModeAccuracy(windowSize, target):
+	modes = getSlidingWindowModes(windowSize)
+	sum = 0.0
+	for mode in modes:
+		if mode == target:
+			sum += 1
+	print "SlidingWindow Mode Accuracy", sum, '/', len(modes),'=',sum/len(modes)
+	return sum / len(modes)
+
 def getAccuracy(silentTreatment, target):
 	global dataMax
 	sum = 0.0
@@ -56,8 +83,8 @@ def getAccuracy(silentTreatment, target):
 			if i == target:
 				sum += 1
 	else:
-		sum = -1
 		print "Unknown silentTreatment in outputVisualizer.getAccuracy()"
+		assert False
 	print sum, '/', total, '=',sum / total, '\t',silentTreatment
 	return sum / total
 
@@ -97,4 +124,5 @@ getAccuracy("ignore silence", target)
 getAccuracy("silence drop", target)
 getAccuracy("strictly no silence", target)
 getStats()
+getSlidingWindowModeAccuracy(windowSize, target)
 # getRawGraph(3)

@@ -2,7 +2,6 @@
 # Separated out since 1) it's long, and 2) the code should change according to what files are used
 
 import re
-import sys
 
 # automatically assigned unique speaker
 # uid = 999
@@ -32,7 +31,7 @@ def getTruthValue(path):
 	elif "CSLU" in directory:
 		return 1
 	print "infoAdultChild.getTruthValue() failed with input:", directory
-	sys.exit()
+	assert False
 	return -1
 
 # -1: Silences
@@ -49,7 +48,7 @@ def getSpeakerID(path):
 	elif "CSLU" in directory:
 		return fileName[2:5]
 	print "infoAdultChild.getSpeakerID() failed with input:", path
-	sys.exit()
+	assert False
 	return -1
 
 def getSIDKeyType():

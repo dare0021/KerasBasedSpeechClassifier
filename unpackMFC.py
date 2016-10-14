@@ -13,8 +13,7 @@ def run(input, featureVectorSize):
 		print "File given: ", input
 		print "Feature count read: ", size
 		print "featureVectorSize: ", featureVectorSize
-		import sys
-		sys.exit()
+		assert False
 	out = np.zeros(shape=(size/featureVectorSize, featureVectorSize))
 	for i in range(size):
 		out[i//featureVectorSize][i%featureVectorSize] = struct.unpack('>f', ''.join(file.read(4)))[0]

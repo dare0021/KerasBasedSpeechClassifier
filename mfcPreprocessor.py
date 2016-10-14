@@ -25,8 +25,7 @@ elif "string" == sidKeyType:
 	otherDataKeys = ['-1']
 else:
 	print "ERR: unknown speakerInfo.getSIDKeyType()", sidKeyType
-	import sys
-	sys.exit()
+	assert False
 
 def strToArr(input):
 	if type(input) is str:
@@ -108,11 +107,10 @@ def collateData(speakerList):
 		elif s in otherData:
 			data = otherData[s]
 		else:
-			import sys
 			print "ERR: unknown speaker", s
 			print fileDict.keys()
 			print otherData.keys()
-			sys.exit()
+			assert False
 		for f in data:
 			x.extend(f)
 			y.extend(np.full((len(f)), truthVals[s], dtype='int8'))
@@ -135,8 +133,7 @@ def getSubset(dropout, ratioOfTestsInInput):
 
 	if (len(explicit_Y_test) > 0) and (ratioOfTestsInInput > 0):
 		print "ERR: can't have both explicit test set and randomly sampled tests from the training sample"
-		import sys
-		sys.exit()
+		assert False
 
 	# generate chosen speakers
 		# randomly drop speakers
