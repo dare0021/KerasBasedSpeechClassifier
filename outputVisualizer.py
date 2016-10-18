@@ -5,8 +5,8 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
-cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60A_dither.txt"
-cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/saveData_Dropout/CJ60C_dither.txt"
+cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60A_dither.txt"
+cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60C_dither.txt"
 
 input = cj60bc
 target = 1
@@ -41,6 +41,7 @@ def getMax(nb_classes):
 # stride set to 1
 def getSlidingWindowModes(windowSize):
 	global dataMax
+	assert len(dataMax) > 0
 	assert windowSize <= len(dataMax)
 	modes = []
 	nb_windows = len(dataMax) - windowSize + 1
@@ -56,6 +57,7 @@ def getSlidingWindowModes(windowSize):
 # stride set to 1
 def getSlidingWindowAverages(windowSize):
 	global data
+	assert len(data) > 0
 	assert windowSize <= len(data)
 	averages = []
 	nb_windows = len(data) - windowSize + 1
@@ -89,6 +91,7 @@ def getSlidingWindowAverageAccuracy(windowSize, target):
 # gets the delta confidence between the target class and the max confidence class
 def getConfidenceDifferential(target):
 	global data
+	assert len(data) > 0
 	retval = []
 	for iter in data:
 		retval.append(iter[target] - np.max(iter))
@@ -98,6 +101,7 @@ def getConfidenceDifferential(target):
 
 def getAccuracy(silentTreatment, target):
 	global data
+	assert len(data) > 0
 	sum = 0.0
 	total = len(data)
 	if silentTreatment == "ignore silence":
@@ -128,6 +132,7 @@ def getAccuracy(silentTreatment, target):
 # savePath can be png or pdf
 def getRawGraph(nb_classes, savePath = "", verbose = True):
 	global data
+	assert len(data) > 0
 	xaxis = np.arange(0, len(data))
 	plt.figure(1)
 	plt.subplot(111)	
@@ -142,7 +147,29 @@ def getRawGraph(nb_classes, savePath = "", verbose = True):
 	else:
 		plt.show()
 
+# Uses fuzzy logic to prevent a filled rect of a graph
+# def getFuzzyGraph(nb_classes, compressionRatio, savePath = "", verbose = True):
+# 	global data
+# 	assert len(data) > 0
+# 	xaxis = np.arange(0, len(data))
+# 	plt.figure(1)
+# 	plt.subplot(111)
+# 	npcopy = np.array(data)
+# 	for i in range(0, len(data)//compressionRatio+1):
+# 		datalet = data[i:i + compressionRatio]
+# 		print datalet
+# 	for i in range(0, nb_classes):
+# 		plt.plot(xaxis, npcopy[:,i], label='C'+str(i))
+# 	plt.legend(loc='center right')
+# 	if not verbose:
+# 		plt.ioff()
+# 	if savePath != "":
+# 		plt.savefit(savePath, bbox_inches='tight')
+# 	else:
+# 		plt.show()
+
 def getStats(verbose = True):
+	assert len(data) > 0
 	npcopy = np.array(data)
 	stddev = np.std(npcopy, axis = 0)
 	mean = np.mean(npcopy, axis = 0)
@@ -162,3 +189,5 @@ getSlidingWindowModeAccuracy(windowSize, target)
 getSlidingWindowAverageAccuracy(windowSize, target)
 getConfidenceDifferential(target)
 # getRawGraph(3)
+
+# getFuzzyGraph(3, 20)

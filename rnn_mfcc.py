@@ -24,7 +24,7 @@ batch_size = 128
 # how many iterations to run
 nb_epoch = 10
 # how to bundle the MFCC vectors
-windowSize = 50
+windowSize = 300
 # Files with accuracy above this are counted as correct
 # 	Manually set due to the otherGroup messing with it
 evaluateAccuracy = 0.5

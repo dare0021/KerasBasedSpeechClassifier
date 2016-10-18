@@ -7,14 +7,14 @@ import os, time
 
 import mfcPreprocessor as mfcpp
 
-modelFile = "saveData_Dropout/model_0.761203902762.json"
-weightsFile = "saveData_Dropout/weights_0.761203902762.h5"
+modelFile = "saveData_0.1Drop/model_0.860061407652.json"
+weightsFile = "saveData_0.1Drop/weights_0.860061407652.h5"
 # Does not check subdirectoreis
-input = "inputData/temp"
-output = "inputData/CJ60A_dither.txt"
+input = "inputData/CJ60C"
+output = "inputData/CJ60C_dither.txt"
 
 # The ground truth value
-targetClass = 0
+targetClass = 1
 
 unpredictableSeed = True
 percentageThreshold = 0.7
