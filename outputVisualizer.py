@@ -148,25 +148,27 @@ def getRawGraph(nb_classes, savePath = "", verbose = True):
 		plt.show()
 
 # Uses fuzzy logic to prevent a filled rect of a graph
-# def getFuzzyGraph(nb_classes, compressionRatio, savePath = "", verbose = True):
-# 	global data
-# 	assert len(data) > 0
-# 	xaxis = np.arange(0, len(data))
-# 	plt.figure(1)
-# 	plt.subplot(111)
-# 	npcopy = np.array(data)
-# 	for i in range(0, len(data)//compressionRatio+1):
-# 		datalet = data[i:i + compressionRatio]
-# 		print datalet
-# 	for i in range(0, nb_classes):
-# 		plt.plot(xaxis, npcopy[:,i], label='C'+str(i))
-# 	plt.legend(loc='center right')
-# 	if not verbose:
-# 		plt.ioff()
-# 	if savePath != "":
-# 		plt.savefit(savePath, bbox_inches='tight')
-# 	else:
-# 		plt.show()
+def getFuzzyGraph(nb_classes, compressionRatio, savePath = "", verbose = True):
+	global data
+	assert len(data) > 0
+	xaxis = np.arange(0, len(data))
+	plt.figure(1)
+	plt.subplot(111)
+	npcopy = np.array(data)
+	prev = 
+	for i in range(0, len(data)//compressionRatio+1):
+		sum = [0,0,0]
+		for arr in data[i:i + compressionRatio]:
+
+	for i in range(0, nb_classes):
+		plt.plot(xaxis, npcopy[:,i], label='C'+str(i))
+	plt.legend(loc='center right')
+	if not verbose:
+		plt.ioff()
+	if savePath != "":
+		plt.savefit(savePath, bbox_inches='tight')
+	else:
+		plt.show()
 
 def getStats(verbose = True):
 	assert len(data) > 0
@@ -190,4 +192,4 @@ getSlidingWindowAverageAccuracy(windowSize, target)
 getConfidenceDifferential(target)
 # getRawGraph(3)
 
-# getFuzzyGraph(3, 20)
+getFuzzyGraph(3, 20)
