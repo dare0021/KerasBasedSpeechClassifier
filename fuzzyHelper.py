@@ -37,7 +37,7 @@ def push(state):
 				setSolidState(state)
 				return state
 			else:
-				currentState = state + fluidSuffix
+				currentState = str(state) + fluidSuffix
 				timeSinceSolidPush += 1
 				return int(currentState[0])
 	elif currentState.endswith(fluidSuffix):
@@ -51,18 +51,25 @@ def push(state):
 				return int(currentState[0])
 		else:
 			timeSameInputs = 1
-			currentState = state + fluidSuffix
+			currentState = str(state) + fluidSuffix
 			timeSinceSolidPush += 1
 			return int(currentState[0])
 	else:
 		assert "Invalid currentState" == ""
 
-def setSolidState(stat):
+def setSolidState(state):
 	global nb_classes, currentState
 	assert nb_classes > 0
 	assert state < nb_classes
-	currentState = state + solidSuffix
+	currentState = str(state) + solidSuffix
 	lastSolidState = currentState
 	timeSinceSolidPush = 0
 
-# TODO: test this class & integrate
+
+init(3, 2)
+print push(1)
+print push(2)
+print push(2)
+print push(0)
+print push(0)
+print push(0)
