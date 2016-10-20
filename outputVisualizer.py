@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60A_dither.txt"
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60C_dither.txt"
 
-input = cj60bc
-target = 1
+input = cj60ba
+target = 0
 # 1 frame is 10ms
 windowSize = 100
 
@@ -85,7 +85,7 @@ def getSlidingWindowAverageAccuracy(windowSize, target):
 	for iter in averages:
 		if np.argmax(iter) == target:
 			sum += 1
-	print "SlidingWindow Average Accuracy", sum, '/', len(averages), '=', sum/len(averages)
+	print "SlidingWindow Average Accuracy @ window size",windowSize,":", sum, '/', len(averages), '=', sum/len(averages)
 	return sum / len(averages)
 
 # gets the delta confidence between the target class and the max confidence class
@@ -127,6 +127,23 @@ def getAccuracy(silentTreatment, target):
 		print "Unknown silentTreatment in outputVisualizer.getAccuracy()"
 		assert False
 	print sum, '/', total, '=',sum / total, '\t',silentTreatment
+	return sum / total
+
+def getFuzzyAccuracy(nb_classes, fuzziness, target, dropSilence = False):
+	global data
+	assert len(data) > 0
+	import fuzzyHelper as fuzzball
+	fuzzball.init(nb_classes, fuzziness)
+	sum = 0.0
+	total = 0
+	for arr in data:
+		max = np.argmax(arr)
+		if dropSilence and max == 2:
+			continue
+		if fuzzball.push(np.argmax(arr)) == target:
+			sum += 1
+		total += 1
+	print "Fuzzy accuracy @ fuzziness " + str(fuzziness),'dropSilence',dropSilence, "=> ",sum,'/',total,'=', str(sum / total)
 	return sum / total
 
 # savePath can be png or pdf
@@ -172,7 +189,7 @@ def getFuzzyGraph(nb_classes, fuzziness, savePath = "", verbose = True):
 	fuzzball.init(nb_classes, fuzziness)
 	yvals = []
 	for arr in data:
-		yval = float(fuzzball.push(np.argmax(arr))) / (nb_classes-1)
+		yval = float(fuzzball.push(np.argmax(arr))) / (nb_classes - 1)
 		yval = (yval - .5) * 0.9 + 0.5
 		yvals.append(yval)
 	plt.scatter(xaxis, yvals)
@@ -208,7 +225,10 @@ getAccuracy("strictly no silence", target)
 getStats()
 getSlidingWindowModeAccuracy(windowSize, target)
 getSlidingWindowAverageAccuracy(windowSize, target)
+getFuzzyAccuracy(3, 1, target)
+getFuzzyAccuracy(3, 2, target)
+getFuzzyAccuracy(3, 3, target)
 getConfidenceDifferential(target)
 # getRawGraph(3)
-getFuzzyGraph(3, 0)
+# getFuzzyGraph(3, 3)
 # getCompressedGraph(3,3)
