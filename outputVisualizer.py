@@ -152,7 +152,7 @@ def getCompressedGraph(nb_classes, compressionRatio, savePath = "", verbose = Tr
 		sum = np.array([0.0,0,0])
 		for arr in data[i:i + compressionRatio]:
 			sum += np.array(arr)
-		yval.append(sum)
+		yval.append(sum / compressionRatio)
 	yval = np.array(yval)
 	for i in range(0, nb_classes):
 		plt.plot(xaxis, yval[:,i], label='C'+str(i))
@@ -175,6 +175,7 @@ def getFuzzyGraph(nb_classes, fuzziness, savePath = "", verbose = True):
 
 def showGraph(plot, savePath, verbose):
 	plot.legend(loc='center right')
+	plot.gca().set_ylim([0,1])
 	if not verbose:
 		plot.ioff()
 	if savePath != "":
@@ -203,5 +204,5 @@ getSlidingWindowModeAccuracy(windowSize, target)
 getSlidingWindowAverageAccuracy(windowSize, target)
 getConfidenceDifferential(target)
 # getRawGraph(3)
-getFuzzyGraph(3, 0)
-# getCompressedGraph(3,3)
+# getFuzzyGraph(3, 0)
+getCompressedGraph(3,3)
