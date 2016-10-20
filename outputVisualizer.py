@@ -139,36 +139,48 @@ def getRawGraph(nb_classes, savePath = "", verbose = True):
 	npcopy = np.array(data)
 	for i in range(0, nb_classes):
 		plt.plot(xaxis, npcopy[:,i], label='C'+str(i))
-	plt.legend(loc='center right')
-	if not verbose:
-		plt.ioff()
-	if savePath != "":
-		plt.savefit(savePath, bbox_inches='tight')
-	else:
-		plt.show()
+	showGraph(plt, savePath, verbose)
+
+def getCompressedGraph(nb_classes, compressionRatio, savePath = "", verbose = True):
+	global data
+	assert len(data) > 0
+	xaxis = np.arange(0, len(data)//compressionRatio+1)
+	plt.figure(1)
+	plt.subplot(111)
+	yval = []
+	for i in range(0, len(data)//compressionRatio+1):
+		sum = np.array([0.0,0,0])
+		for arr in data[i:i + compressionRatio]:
+			sum += np.array(arr)
+		yval.append(sum)
+	yval = np.array(yval)
+	for i in range(0, nb_classes):
+		plt.plot(xaxis, yval[:,i], label='C'+str(i))
+	showGraph(plt, savePath, verbose)
 
 # Uses fuzzy logic to prevent a filled rect of a graph
-def getFuzzyGraph(nb_classes, compressionRatio, savePath = "", verbose = True):
+def getFuzzyGraph(nb_classes, fuzziness, savePath = "", verbose = True):
 	global data
 	assert len(data) > 0
 	xaxis = np.arange(0, len(data))
 	plt.figure(1)
 	plt.subplot(111)
-	npcopy = np.array(data)
-	prev = 
-	for i in range(0, len(data)//compressionRatio+1):
-		sum = [0,0,0]
-		for arr in data[i:i + compressionRatio]:
+	import fuzzyHelper as fuzzball
+	fuzzball.init(nb_classes, fuzziness)
+	yvals = []
+	for arr in range(0, len(data)):
+		yvals.append(fuzzball.push(np.argmax(arr)))
+	plt.plot(xaxis, yvals)
+	showGraph(plt, savePath, verbose)
 
-	for i in range(0, nb_classes):
-		plt.plot(xaxis, npcopy[:,i], label='C'+str(i))
-	plt.legend(loc='center right')
+def showGraph(plot, savePath, verbose):
+	plot.legend(loc='center right')
 	if not verbose:
-		plt.ioff()
+		plot.ioff()
 	if savePath != "":
-		plt.savefit(savePath, bbox_inches='tight')
+		plot.savefit(savePath, bbox_inches='tight')
 	else:
-		plt.show()
+		plot.show()
 
 def getStats(verbose = True):
 	assert len(data) > 0
@@ -191,5 +203,5 @@ getSlidingWindowModeAccuracy(windowSize, target)
 getSlidingWindowAverageAccuracy(windowSize, target)
 getConfidenceDifferential(target)
 # getRawGraph(3)
-
-getFuzzyGraph(3, 20)
+getFuzzyGraph(3, 0)
+# getCompressedGraph(3,3)

@@ -62,7 +62,7 @@ def setSolidState(state):
 	assert nb_classes > 0
 	assert state < nb_classes
 	currentState = str(state) + solidSuffix	
-	lastSolidState = int(currentState[0])
+	lastSolidState = getCurrentState()
 	timeSinceSolidPush = 0
 
 def getCurrentState():
