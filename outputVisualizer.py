@@ -172,13 +172,16 @@ def getFuzzyGraph(nb_classes, fuzziness, savePath = "", verbose = True):
 	fuzzball.init(nb_classes, fuzziness)
 	yvals = []
 	for arr in data:
-		yvals.append(fuzzball.push(np.argmax(arr)))
-	plt.plot(xaxis, yvals)
+		yval = float(fuzzball.push(np.argmax(arr))) / (nb_classes-1)
+		yval = (yval - .5) * 0.9 + 0.5
+		yvals.append(yval)
+	plt.scatter(xaxis, yvals)
 	showGraph(plt, savePath, verbose)
 
 def showGraph(plot, savePath, verbose):
 	plot.legend(loc='center right')
 	plot.gca().set_ylim([0,1])
+	plot.gca().set_xlim([0,plot.gca().get_xlim()[1]])
 	if not verbose:
 		plot.ioff()
 	if savePath != "":
