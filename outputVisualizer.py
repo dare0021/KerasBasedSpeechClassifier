@@ -144,11 +144,14 @@ def getRawGraph(nb_classes, savePath = "", verbose = True):
 def getCompressedGraph(nb_classes, compressionRatio, savePath = "", verbose = True):
 	global data
 	assert len(data) > 0
-	xaxis = np.arange(0, len(data)//compressionRatio+1)
+	xlen = len(data)//compressionRatio
+	if xlen < len(data) / compressionRatio:
+		xlen += 1
+	xaxis = np.arange(0, xlen)
 	plt.figure(1)
 	plt.subplot(111)
 	yval = []
-	for i in range(0, len(data)//compressionRatio+1):
+	for i in range(0, xlen):
 		sum = np.array([0.0,0,0])
 		for arr in data[i:i + compressionRatio]:
 			sum += np.array(arr)
@@ -168,7 +171,7 @@ def getFuzzyGraph(nb_classes, fuzziness, savePath = "", verbose = True):
 	import fuzzyHelper as fuzzball
 	fuzzball.init(nb_classes, fuzziness)
 	yvals = []
-	for arr in range(0, len(data)):
+	for arr in data:
 		yvals.append(fuzzball.push(np.argmax(arr)))
 	plt.plot(xaxis, yvals)
 	showGraph(plt, savePath, verbose)
@@ -204,5 +207,5 @@ getSlidingWindowModeAccuracy(windowSize, target)
 getSlidingWindowAverageAccuracy(windowSize, target)
 getConfidenceDifferential(target)
 # getRawGraph(3)
-# getFuzzyGraph(3, 0)
-getCompressedGraph(3,3)
+getFuzzyGraph(3, 0)
+# getCompressedGraph(3,3)
