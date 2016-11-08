@@ -26,7 +26,8 @@ ets = None
 # 		[]]
 # rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13NoSilences2e5", "../SPK_DB/mfc13OnlySilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
 # rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13NoSilences2e5", "../SPK_DB/mfc13OnlySilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13OnlySilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
-rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13noisyNoSilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13noisyOnlySilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1NoSilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1OnlySilences8.4e6"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
+# rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13noisyNoSilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13noisyOnlySilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1NoSilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1OnlySilences8.4e6"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
+rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/wav16normalizedNoisy", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/1234normalized"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, explicitTestSet = ets)
 
 for i in range(numIterations):
 	print "___________________________"

@@ -75,4 +75,16 @@ def run(input, output):
 	genData = generateOutput(model, input)
 	saveGeneratedData(genData, output)
 
-run(input, output)
+def multiRun(input, output, weightsFolder):
+	global modelFile
+	global weightsFile
+
+	filesThisPath = [weightsFolder + "/" + f for f in os.listdir(weightsFolder) if os.path.isfile(os.path.join(weightsFolder, f)) and f.endswith(".h5")]
+	for path in filesThisPath:
+		weightsFile = path
+		modelFile = path[:len(path)-3] + ".json"
+		print "run", modelFile
+		run(path, output + "/" + path + ".txt")
+
+# run(input, output)
+multiRun(input, "saveData_Normalized300_0.1", "saveData_NoIntermittentDrop")
