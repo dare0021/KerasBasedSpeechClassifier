@@ -38,7 +38,6 @@ def evaluate(vect):
 def generateOutput(model, parentDir):
 	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, 1)
-	print len(X_train), len(X_test), len(Y_train), len(Y_test)
 	return model.predict_proba(X_test)
 
 def saveGeneratedData(data, path):
@@ -109,6 +108,8 @@ def multiRun(input, output, weightsFolder):
 
 	print "Max Accuracy:", max
 	print "Using:", maxFile
+	with open(output + "/_max.txt", 'w') as f:
+		f.write(str(max) + "\n" + maxFile)
 
 # run(input, output)
 multiRun(input, "saveData_Normalized300_0.1/output", "saveData_Normalized300_0.1/weights")
