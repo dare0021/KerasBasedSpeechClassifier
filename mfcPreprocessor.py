@@ -44,6 +44,22 @@ def loadTestSetAuto(rootPath, featureVectorSize):
 			explicit_X_test.append(data)
 			explicit_Y_test.extend(np.full((len(data)), sinfo.getTruthValue(path), dtype='int8'))
 
+def clean():
+	global fileDict
+	global otherData
+	global otherDataKeys
+	global truthVals
+	global explicit_X_test
+	global explicit_Y_test
+	global testSpeakers
+	fileDict = dict()
+	otherData = dict()
+	otherDataKeys = []
+	truthVals = dict()
+	explicit_X_test = []
+	explicit_Y_test = []
+	testSpeakers = []
+
 # rootPath is the string or an array of strings of paths of directories to use
 # Does not peek in to subdirectories
 # percentageThreshold is when to drop a feature vector by how much of it is zero

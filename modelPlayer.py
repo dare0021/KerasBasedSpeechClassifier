@@ -22,7 +22,7 @@ unpredictableSeed = True
 percentageThreshold = 0.7
 featureVectorSize = 13
 explicitTestSet = None
-windowSize = 50
+windowSize = 300
 inputDrop = 0
 
 # ====================================
@@ -38,6 +38,7 @@ def evaluate(vect):
 def generateOutput(model, parentDir):
 	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, 1)
+	print len(X_train), len(X_test), len(Y_train), len(Y_test)
 	return model.predict_proba(X_test)
 
 def saveGeneratedData(data, path):
@@ -64,6 +65,15 @@ def saveGeneratedData(data, path):
 	with open(path, 'w') as f:
 		f.write(stringData)
 	print stringData
+	return acc
+
+def clean():
+	global sumCorrect
+	global sumTotal
+
+	sumCorrect = 0
+	sumTotal = 0
+	mfcpp.clean()
 
 def run(input, output):
 	if not unpredictableSeed:
@@ -75,20 +85,30 @@ def run(input, output):
 	model.compile(loss='categorical_crossentropy',
 	              optimizer='adadelta')
 	genData = generateOutput(model, input)
-	saveGeneratedData(genData, output)
+	return saveGeneratedData(genData, output)
 
 def multiRun(input, output, weightsFolder):
 	global modelFile
 	global weightsFile
 
+	max = 0.0
+	maxFile = ""
 	filesThisPath = [weightsFolder + "/" + f for f in os.listdir(weightsFolder) if os.path.isfile(os.path.join(weightsFolder, f)) and f.endswith(".h5")]
 	for path in filesThisPath:
+		clean()
 		weightsFile = path
-		modelFile = path[:len(path)-3] + ".json"
+		modelFile = path[:path.rfind("weights_")] + "model_"
+		prob = path[path.rfind("_")+1:]
+		prob = prob[:len(prob)-3]
+		modelFile += prob + ".json"
 		print "run", modelFile
-		run(path, output + "/" + path + ".txt")
+		acc = run(input, output + "/" + prob + ".txt")
+		if acc > max:
+			max = acc
+			maxFile = weightsFile
 
-	# TODO: keep track of which weights were the best
+	print "Max Accuracy:", max
+	print "Using:", maxFile
 
-run(input, output)
-# multiRun(input, "saveData_Normalized300_0.1", "saveData_NoIntermittentDrop")
+# run(input, output)
+multiRun(input, "saveData_Normalized300_0.1/output", "saveData_Normalized300_0.1/weights")
