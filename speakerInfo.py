@@ -6,7 +6,6 @@ import sys
 
 # import infoMaleFemale as moduleToUse
 import infoAdultChild as moduleToUse
-# import infoUID as moduleToUse
 
 # returns whether the file path is for a male or female speaker
 # 0: Male
@@ -26,3 +25,7 @@ def getSIDKeyType():
 
 def getNbClasses():
 	return moduleToUse.getNbClasses()
+
+def overrideForModelPlayer():
+	global moduleToUse
+	import infoUID as moduleToUse

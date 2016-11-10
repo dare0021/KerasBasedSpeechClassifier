@@ -6,6 +6,8 @@ import numpy as np
 import os, time
 
 import mfcPreprocessor as mfcpp
+import speakerInfo as si
+si.overrideForModelPlayer()
 
 modelFile = "saveData_0.1Drop/model_0.860061407652.json"
 weightsFile = "saveData_0.1Drop/weights_0.860061407652.h5"
@@ -86,5 +88,7 @@ def multiRun(input, output, weightsFolder):
 		print "run", modelFile
 		run(path, output + "/" + path + ".txt")
 
-# run(input, output)
-multiRun(input, "saveData_Normalized300_0.1", "saveData_NoIntermittentDrop")
+	# TODO: keep track of which weights were the best
+
+run(input, output)
+# multiRun(input, "saveData_Normalized300_0.1", "saveData_NoIntermittentDrop")
