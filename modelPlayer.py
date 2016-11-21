@@ -12,8 +12,8 @@ si.overrideForModelPlayer()
 modelFile = "saveData_0.1Drop/model_0.860061407652.json"
 weightsFile = "saveData_0.1Drop/weights_0.860061407652.h5"
 # Does not check subdirectoreis
-input = "inputData/CJ60C"
-output = "inputData/CJ60C_dither.txt"
+input = "inputData/clean/C"
+output = "inputData/clean/outC.txt"
 
 # The ground truth value
 targetClass = 1
@@ -91,6 +91,7 @@ def multiRun(input, output, weightsFolder):
 	global weightsFile
 
 	max = 0.0
+	sum = 0.0
 	maxFile = ""
 	filesThisPath = [weightsFolder + "/" + f for f in os.listdir(weightsFolder) if os.path.isfile(os.path.join(weightsFolder, f)) and f.endswith(".h5")]
 	for path in filesThisPath:
@@ -102,12 +103,14 @@ def multiRun(input, output, weightsFolder):
 		modelFile += prob + ".json"
 		print "run", modelFile
 		acc = run(input, output + "/" + prob + ".txt")
+		sum += acc
 		if acc > max:
 			max = acc
 			maxFile = weightsFile
 
 	print "Max Accuracy:", max
 	print "Using:", maxFile
+	print "Avg:", sum / len(filesThisPath)
 	with open(output + "/_max.txt", 'w') as f:
 		f.write(str(max) + "\n" + maxFile)
 
