@@ -12,11 +12,11 @@ si.overrideForModelPlayer()
 modelFile = "saveData_0.1Drop/model_0.860061407652.json"
 weightsFile = "saveData_0.1Drop/weights_0.860061407652.h5"
 # Does not check subdirectoreis
-input = "inputData/clean/C"
+input = "inputData/clean/M"
 output = "inputData/clean/outC.txt"
 
 # The ground truth value
-targetClass = 1
+targetClass = 0
 
 unpredictableSeed = True
 percentageThreshold = 0.7
@@ -115,4 +115,4 @@ def multiRun(input, output, weightsFolder):
 		f.write(str(max) + "\n" + maxFile)
 
 # run(input, output)
-multiRun(input, "saveData_Normalized300_0.1/output", "saveData_Normalized300_0.1/weights")
+multiRun(input, "saveData_MF300_0.1/M", "saveData_MF300_0.1/weights")
