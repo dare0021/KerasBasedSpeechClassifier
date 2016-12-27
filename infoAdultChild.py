@@ -30,6 +30,8 @@ def getTruthValue(path):
 		return 0
 	elif "CSLU" in directory:
 		return 1
+	elif "oscaar" in directory:	#add new child voice db: "oscaar"
+		return 1
 	print "infoAdultChild.getTruthValue() failed with input:", directory
 	assert False
 	return -1
@@ -47,6 +49,8 @@ def getSpeakerID(path):
 		return fileName[1:4]
 	elif "CSLU" in directory:
 		return fileName[2:5]
+	elif "oscaar" in directory:	#add new child voice db: "oscaar"
+		return fileName[0:6]
 	print "infoAdultChild.getSpeakerID() failed with input:", path
 	assert False
 	return -1
@@ -55,7 +59,7 @@ def getSIDKeyType():
 	return "string"
 
 def getNbClasses():
-	return 3
+	return 2	# 3 -> 2
 
 # print getSpeakerID("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1NoSilences8.4e6/ks000010.wav.mfc")
 # print getSpeakerID("ks000010.wav.mfc")

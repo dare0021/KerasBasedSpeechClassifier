@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60A_dither.txt"
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60C_dither.txt"
+projectFolder = "/home/jkih/projects/KerasBasedSpeechClassifier/"
 
-input = cj60ba
-target = 0
+input = projectFolder + "saveData_MF300_0.1/F_cnn/0.911034900141.txt"
+target = 1
 # 1 frame is 10ms
-windowSize = 100
+windowSize = 10
 
 data = []
 dataMax = []
