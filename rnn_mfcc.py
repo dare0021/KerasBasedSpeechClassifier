@@ -77,7 +77,10 @@ def evaluate(model, accThresh):
 # Call prepareDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
-def run(inputDrop, flags):
+
+run = runCNN
+
+def runCNN(inputDrop, flags):
 	global maxAccuracy
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
@@ -140,70 +143,70 @@ def run(inputDrop, flags):
 	return (s, acc, timeTaken)
 
 # LSTM from keras document
-# def run(inputDrop, flags):
-# 	global maxAccuracy
-# 	hidden_units = 100
-# 	nb_classes = 10
-# 	batch_size_lstm=1
+def runLSTM(inputDrop, flags):
+	global maxAccuracy
+	hidden_units = 100
+	nb_classes = 10
+	batch_size_lstm=1
 
-# 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
 
-# 	print "X_train", X_train.shape
-# 	print "Y_train", Y_train.shape
-# 	print "X_test", X_test.shape
-# 	print "Y_test", Y_test.shape
-
-# # 	model = Sequential()
-
-# # 	model.add(Convolution2D(nb_filters, filter_len, filter_len,
-# # 	                        border_mode='valid',
-# # 	                        input_shape=(1, windowSize, X_train.shape[3]),
-# # 	                        activation='relu'))
+	print "X_train", X_train.shape
+	print "Y_train", Y_train.shape
+	print "X_test", X_test.shape
+	print "Y_test", Y_test.shape
 
 # 	model = Sequential()
 
-# 	model.add(LSTM(output_dim=hidden_units, init='uniform', inner_init='uniform', 
-# 		forget_bias_init='one', activation='tanh', inner_activation='sigmoid', return_sequences=True,
-# 		batch_input_shape=(batch_size_lstm, windowSize, X_train.shape[2])))
+# 	model.add(Convolution2D(nb_filters, filter_len, filter_len,
+# 	                        border_mode='valid',
+# 	                        input_shape=(1, windowSize, X_train.shape[3]),
+# 	                        activation='relu'))
 
-# 	model.add(Dropout(0.1))
-# 	# model.add(MaxPooling2D(pool_size=(2,2)))
+	model = Sequential()
 
-# 	model.add(Flatten())
-# 	model.add(Dense(256, activation='relu'))
-# 	model.add(Dropout(0.5))
-# 	model.add(Dense(sinfo.getNbClasses(), activation='softmax'))
+	model.add(LSTM(output_dim=hidden_units, init='uniform', inner_init='uniform', 
+		forget_bias_init='one', activation='tanh', inner_activation='sigmoid', return_sequences=True,
+		batch_input_shape=(batch_size_lstm, windowSize, X_train.shape[2])))
 
-# 	model.compile(loss='categorical_crossentropy',
-# 	              optimizer='adadelta',
-# 	              metrics=['accuracy'])
+	model.add(Dropout(0.1))
+	# model.add(MaxPooling2D(pool_size=(2,2)))
 
-# 	model.fit(X_train, Y_train, batch_size=batch_size_lstm, nb_epoch=nb_epoch,
-# 			verbose=2, validation_data=(X_test, Y_test))
+	model.add(Flatten())
+	model.add(Dense(256, activation='relu'))
+	model.add(Dropout(0.5))
+	model.add(Dense(sinfo.getNbClasses(), activation='softmax'))
+
+	model.compile(loss='categorical_crossentropy',
+	              optimizer='adadelta',
+	              metrics=['accuracy'])
+
+	model.fit(X_train, Y_train, batch_size=batch_size_lstm, nb_epoch=nb_epoch,
+			verbose=2, validation_data=(X_test, Y_test))
 	
-# 	score = [0, 0]
+	score = [0, 0]
 
-# 	if ratioOfTestsInInput > 0:
-# 		score = model.evaluate(X_test, Y_test, verbose=0)
-# 	timeTaken = time.clock() - start
+	if ratioOfTestsInInput > 0:
+		score = model.evaluate(X_test, Y_test, verbose=0)
+	timeTaken = time.clock() - start
 
-# 	print('Time taken:', timeTaken)
-# 	print('Test score:', score[0])
-# 	print('Test accuracy:', score[1])
+	print('Time taken:', timeTaken)
+	print('Test score:', score[0])
+	print('Test accuracy:', score[1])
 
-# 	s = score[0]
-# 	acc = score[1]
-# 	if 'returnCustomEvalAccuracy' in flags:
-# 		s = -1
-# 		acc = evaluate(model, evaluateAccuracy)
-# 		print('Evaluator accuracy:', acc)
-# 	if 'saveMaxVer' in flags and ((not onlySaveBestOnes) or maxAccuracy < acc):
-# 		if maxAccuracy < acc:
-# 			maxAccuracy = acc
-# 		import os
-# 		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
-# 		jsonData = model.to_json()
-# 		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
-# 			f.write(jsonData)
+	s = score[0]
+	acc = score[1]
+	if 'returnCustomEvalAccuracy' in flags:
+		s = -1
+		acc = evaluate(model, evaluateAccuracy)
+		print('Evaluator accuracy:', acc)
+	if 'saveMaxVer' in flags and ((not onlySaveBestOnes) or maxAccuracy < acc):
+		if maxAccuracy < acc:
+			maxAccuracy = acc
+		import os
+		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
+		jsonData = model.to_json()
+		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
+			f.write(jsonData)
 
-# 	return (s, acc, timeTaken)
+	return (s, acc, timeTaken)
