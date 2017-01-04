@@ -27,7 +27,7 @@ batch_size = 128
 # how many iterations to run
 nb_epoch = 10
 # how to bundle the MFCC vectors
-	
+windowSize = 100
 # Files with accuracy above this are counted as correct
 # 	Manually set due to the otherGroup messing with it
 evaluateAccuracy = 0.5
@@ -41,8 +41,6 @@ saveModelsTo = "model"
 maxAccuracy = 0
 onlySaveBestOnes = False;
 
-#don't know how to set this 
-windowSize = 100
 
 # input: Directory(ies) where the mfc files are in
 def prepareDataSet(input, unpredictableSeed, featureVectorSize):
