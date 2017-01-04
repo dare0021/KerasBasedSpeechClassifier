@@ -45,12 +45,12 @@ onlySaveBestOnes = False;
 windowSize = 100
 
 # input: Directory(ies) where the mfc files are in
-def prepareDataSet(input, unpredictableSeed, featureVectorSize, explicitTestSet):
+def prepareDataSet(input, unpredictableSeed, featureVectorSize):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
 
-	mfcpp.run(input, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
+	mfcpp.run(input, percentageThreshold, featureVectorSize, windowSize)
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):
@@ -156,13 +156,6 @@ def runLSTM(inputDrop, flags):
 	print "X_test", X_test.shape
 	print "Y_test", Y_test.shape
 
-# 	model = Sequential()
-
-# 	model.add(Convolution2D(nb_filters, filter_len, filter_len,
-# 	                        border_mode='valid',
-# 	                        input_shape=(1, windowSize, X_train.shape[3]),
-# 	                        activation='relu'))
-
 	model = Sequential()
 
 	model.add(LSTM(output_dim=hidden_units, init='uniform', inner_init='uniform', 
@@ -170,7 +163,6 @@ def runLSTM(inputDrop, flags):
 		batch_input_shape=(batch_size_lstm, windowSize, X_train.shape[2])))
 
 	model.add(Dropout(0.1))
-	# model.add(MaxPooling2D(pool_size=(2,2)))
 
 	model.add(Flatten())
 	model.add(Dense(256, activation='relu'))

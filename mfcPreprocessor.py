@@ -13,9 +13,6 @@ otherData = dict()
 otherDataKeys = []
 truthVals = dict()
 
-explicit_X_test = []
-explicit_Y_test = []
-
 testSpeakers = []
 
 sidKeyType = sinfo.getSIDKeyType()
@@ -32,32 +29,16 @@ def strToArr(input):
 		return [input]
 	return input
 
-def loadTestSetAuto(rootPath, featureVectorSize):
-	global explicit_X_test
-	global explicit_Y_test
-
-	rootPath = strToArr(rootPath)
-	for p in rootPath:
-		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
-		for path in filesThisPath:
-			data = unmfc.run(path, featureVectorSize)
-			explicit_X_test.append(data)
-			explicit_Y_test.extend(np.full((len(data)), sinfo.getTruthValue(path), dtype='int8'))
-
 def clean():
 	global fileDict
 	global otherData
 	global otherDataKeys
 	global truthVals
-	global explicit_X_test
-	global explicit_Y_test
 	global testSpeakers
 	fileDict = dict()
 	otherData = dict()
 	otherDataKeys = []
 	truthVals = dict()
-	explicit_X_test = []
-	explicit_Y_test = []
 	testSpeakers = []
 
 # rootPath is the string or an array of strings of paths of directories to use
@@ -66,24 +47,12 @@ def clean():
 # not implemented in this version
 # <1% drops for 0.7 
 # >20% for 0.6
-# Both of above for clean samples
-# explicitTestSet[0] contains paths, while explicitTestSet[1] contains truth values
-def run(rootPath, percentageThreshold, featureVectorSize, explicitTestSet, windowSize):
+def run(rootPath, percentageThreshold, featureVectorSize, windowSize):
 	global fileDict
 	global otherData
 	global truthVals
-	global explicit_X_test
-	global explicit_Y_test
 
 	rootPath = strToArr(rootPath)
-	if explicitTestSet != None:
-		explicitTestSet = strToArr(explicitTestSet[0])
-		explicitTestSet = unmfc.runForAll(explicitTestSet, featureVectorSize, windowSize)
-		i = 0
-		for f in explicitTestSet:
-			explicit_X_test.extend(f)
-			explicit_Y_test.extend(np.full((len(f)), explicitTestSet[1][i], dtype='int8'))
-			i += 1
 
 	print "Importing files..."
 	fileCount = 0
@@ -143,13 +112,7 @@ def getSubset(dropout, ratioOfTestsInInput):
 	global fileDict
 	global otherData
 	global truthVals
-	global explicit_X_test
-	global explicit_Y_test
 	global testSpeakers
-
-	if (len(explicit_Y_test) > 0) and (ratioOfTestsInInput > 0):
-		print "ERR: can't have both explicit test set and randomly sampled tests from the training sample"
-		assert False
 
 	# generate chosen speakers
 		# randomly drop speakers
@@ -159,46 +122,27 @@ def getSubset(dropout, ratioOfTestsInInput):
 		# X set should be [None, 1, freq, 1]
 		# Y set should be [None, 1] and match the X set in cardinality
 
-	# Auto
-	if len(explicit_Y_test) <= 0:
-		print 'auto getSubset()'
-		speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
-		np.random.shuffle(speakerList)
+	speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
+	np.random.shuffle(speakerList)
 
-		if ratioOfTestsInInput == 1:
-			trainListSize = 0
-		else:
-			trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
-		speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
-		testSpeakers = speakersTest
-
-		otherGroup = []
-		otherGroup.extend(otherData)
-		speakersTrain = np.append(speakersTrain, otherGroup)
-		X_train, Y_train = collateData(speakersTrain)
-		X_test, Y_test = collateData(speakersTest)
-
-		Y_train = np_utils.to_categorical(Y_train, sinfo.getNbClasses())
-		Y_test = np_utils.to_categorical(Y_test, sinfo.getNbClasses())
-
-		X_train = np.array(X_train, dtype='float32')
-		X_test = np.array(X_test, dtype='float32')
-	# Manual explicit test group
+	if ratioOfTestsInInput == 1:
+		trainListSize = 0
 	else:
-		print 'explicit manual test set'
-		speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
-		np.random.shuffle(speakerList)
+		trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
+	speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
+	testSpeakers = speakersTest
 
-		otherGroup = []
-		otherGroup.extend(otherData)
-		speakersTrain = np.append(speakersTrain, otherGroup)
-		X_train, Y_train = collateData(speakerList)
+	otherGroup = []
+	otherGroup.extend(otherData)
+	speakersTrain = np.append(speakersTrain, otherGroup)
+	X_train, Y_train = collateData(speakersTrain)
+	X_test, Y_test = collateData(speakersTest)
 
-		Y_train = np_utils.to_categorical(Y_train, sinfo.getNbClasses())
-		Y_test = np_utils.to_categorical(explicit_Y_test, sinfo.getNbClasses())
+	Y_train = np_utils.to_categorical(Y_train, sinfo.getNbClasses())
+	Y_test = np_utils.to_categorical(Y_test, sinfo.getNbClasses())
 
-		X_train = np.array(X_train, dtype='float32')
-		X_test = np.array(explicit_X_test, dtype='float32')
+	X_train = np.array(X_train, dtype='float32')
+	X_test = np.array(X_test, dtype='float32')
 
 	if X_train.shape[0] > 0:
 		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], X_train.shape[2])
@@ -226,8 +170,3 @@ def getSubset(dropout, ratioOfTestsInInput):
 # run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
 # print fileDict
 # print truthVals
-# loadTestSetAuto("../SPK_DB/mfc13")
-# loadTestSetAuto(["../SPK_DB/mfc13","/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13"])
-# print np.array(explicit_X_test).shape
-# print np.array(explicit_Y_test).shape
-# print getSubset(3, 0, .1)

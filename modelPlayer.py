@@ -21,7 +21,6 @@ targetClass = 0
 unpredictableSeed = True
 percentageThreshold = 0.7
 featureVectorSize = 13
-explicitTestSet = None
 windowSize = 100
 inputDrop = 0
 
@@ -36,7 +35,7 @@ def evaluate(vect):
 	return 1
 
 def generateOutput(model, parentDir):
-	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, explicitTestSet, windowSize)
+	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, windowSize)
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, 1)
 	return model.predict_proba(X_test)
 
