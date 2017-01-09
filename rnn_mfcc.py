@@ -14,7 +14,7 @@ import speakerInfo as sinfo
 # Ratio of tests vs input. Training set is (1 - this) of the input.
 ratioOfTestsInInput = 0.1
 # Cull samples which have <= this ratio of data points as non-zero values
-percentageThreshold = 0.7
+percentageThreshold = 0.0
 
 # number of samples before weight update
 batch_size = 128

@@ -44,11 +44,11 @@ def clean():
 	testSpeakers = []
 
 
-def pickleDataSet(input, featureVectorSize, pickleName):
+def pickleDataSet(input, percentageThreshold, featureVectorSize, pickleName):
 	import cPickle as pickle
-	mfcpp.run(input, percentageThreshold, featureVectorSize, 0)
+	run(input, percentageThreshold, featureVectorSize, 0)
 	with open("pickles/"+pickleName, 'wb') as f:
-		pickle.dump((mfcpp.fileDict, mfcpp.otherData, mfcpp.truthVals), 
+		pickle.dump((fileDict, otherData, truthVals), 
 			f, pickle.HIGHEST_PROTOCOL)	
 
 # rootPath is the string or an array of strings of paths of directories to use
@@ -172,3 +172,5 @@ def getSubset(dropout, ratioOfTestsInInput):
 # run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
 # print fileDict
 # print truthVals
+pickleDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5"],
+	0.0, 13, "oscar_clsu7_10_vctk2e5.pkl")
