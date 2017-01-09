@@ -1,6 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution2D, MaxPooling2D
+from keras.layers import Convolution1D, MaxPooling1D
 from keras.utils import np_utils
 
 from keras.layers import Embedding
@@ -43,12 +43,13 @@ onlySaveBestOnes = False;
 
 
 # input: Directory(ies) where the mfc files are in
-def prepareDataSet(input, unpredictableSeed, featureVectorSize):
+# use dropout to speed up training for whatever reason
+def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
 
-	mfcpp.run(input, percentageThreshold, featureVectorSize, windowSize)
+	mfcpp.run(input, percentageThreshold, featureVectorSize, windowSize, dropout)
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):
@@ -61,7 +62,7 @@ def evaluate(model, accThresh):
 		for f in fileFeatVects:
 			x = np.array(f)
 			i += 1
-			score = model.evaluate(x.reshape(x.shape[0], 1, x.shape[1], x.shape[2]), np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), sinfo.getNbClasses()), verbose=0)
+			score = model.evaluate(x, np_utils.to_categorical(np.full((len(f)), truthVal, dtype='int8'), sinfo.getNbClasses()), verbose=0)
 			if score[1] > accThresh:
 				accSum += 1
 	return ((float)(accSum)) / i
@@ -76,9 +77,7 @@ def evaluate(model, accThresh):
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
 
-run = runCNN
-
-def runCNN(inputDrop, flags):
+def runCNN1D(inputDrop, flags):
 	global maxAccuracy
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
@@ -90,14 +89,13 @@ def runCNN(inputDrop, flags):
 
 	model = Sequential()
 
-	model.add(Convolution2D(nb_filters, filter_len, filter_len,
-	                        border_mode='valid',
-	                        input_shape=(1, windowSize, X_train.shape[3]),
+	model.add(Convolution1D(nb_filters, filter_len,
+	                        input_shape=(windowSize, X_train.shape[-1]),
 	                        activation='relu'))
-	model.add(Dropout(0.1))
-	model.add(Convolution2D(nb_filters, filter_len, filter_len, activation='relu'))
-	model.add(Dropout(0.1))
-	model.add(MaxPooling2D(pool_size=(2,2)))
+	model.add(Dropout(0.2))
+	model.add(Convolution1D(nb_filters, filter_len, activation='relu'))
+	model.add(Dropout(0.2))
+	model.add(MaxPooling1D(2))
 
 	model.add(Flatten())
 	model.add(Dense(256, activation='relu'))
@@ -200,3 +198,5 @@ def runLSTM(inputDrop, flags):
 			f.write(jsonData)
 
 	return (s, acc, timeTaken)
+
+run = runCNN1D

@@ -1,6 +1,7 @@
 import numpy as np
 import unpackMFC as unmfc
 import speakerInfo as sinfo
+import random
 from os import listdir
 from os.path import isfile, join
 from keras.utils import np_utils
@@ -47,7 +48,8 @@ def clean():
 # not implemented in this version
 # <1% drops for 0.7 
 # >20% for 0.6
-def run(rootPath, percentageThreshold, featureVectorSize, windowSize):
+# dropout in the function argument is for dropping files
+def run(rootPath, percentageThreshold, featureVectorSize, windowSize, dropout):
 	global fileDict
 	global otherData
 	global truthVals
@@ -58,6 +60,8 @@ def run(rootPath, percentageThreshold, featureVectorSize, windowSize):
 	fileCount = 0
 	for p in rootPath:
 		filesThisPath = [p + "/" + f for f in listdir(p) if isfile(join(p, f)) and f.endswith(".mfc")]
+		if dropout > 0.0:
+			filesThisPath = random.sample(filesThisPath, int(len(filesThisPath)*(1-dropout)))
 		fileCount += len(filesThisPath)
 		print fileCount, "files found so far."
 		for path in filesThisPath:
@@ -143,17 +147,6 @@ def getSubset(dropout, ratioOfTestsInInput):
 
 	X_train = np.array(X_train, dtype='float32')
 	X_test = np.array(X_test, dtype='float32')
-
-	if X_train.shape[0] > 0:
-		X_train = X_train.reshape(X_train.shape[0], 1, X_train.shape[1], X_train.shape[2])
-		# X_train = X_train.reshape(X_train.shape[0], X_train.shape[1], X_train.shape[2])	#LSTM
-	else:
-		print 'WARN: X_train.shape[0] <= 0', X_train.shape
-	if X_test.shape[0] > 0:
-		X_test = X_test.reshape(X_test.shape[0], 1, X_test.shape[1], X_test.shape[2])
-		# X_test = X_test.reshape(X_test.shape[0], X_test.shape[1], X_test.shape[2])	#LSTM
-	else:
-		print 'WARN: X_test.shape[0] <= 0', X_test.shape
 
 	print "Training set:", speakersTrain
 	print "Testing  set:", speakersTest
