@@ -15,12 +15,6 @@ import speakerInfo as sinfo
 ratioOfTestsInInput = 0.1
 # Cull samples which have <= this ratio of data points as non-zero values
 percentageThreshold = 0.7
-# number of convolutional filters to use
-nb_filters = 32
-# size of pooling area for max pooling
-nb_pool = 2
-# convolution kernel size
-filter_len = 3
 
 # number of samples before weight update
 batch_size = 128
@@ -41,6 +35,22 @@ saveModelsTo = "model"
 maxAccuracy = 0
 onlySaveBestOnes = False;
 
+def windowDict(dic):
+	for k in d.iterkeys():
+		raw = d[k]
+		numcells = len(raw) // windowSize
+		if len(raw) % windowSize > 0:
+			numcells += 1
+		raw = raw.flatten()
+		raw = np.append(raw, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(raw))))
+		d[k] = raw.reshape(numcells, windowSize, featureVectorSize)
+
+def loadPickledDataSet(pickleName, featureVectorSize):
+	import cPickle as pickle
+	with open("pickles/"+pickleName, 'rb') as f:
+		mfcpp.fileDict, mfcpp.otherData, mfcpp.truthVals = pickle.load(f)
+	windowDict(mfcpp.fileDict)
+	windowDict(mfcpp.otherData)
 
 # input: Directory(ies) where the mfc files are in
 # use dropout to speed up training for whatever reason
@@ -48,8 +58,7 @@ def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
-
-	mfcpp.run(input, percentageThreshold, featureVectorSize, windowSize, dropout)
+	mfcpp.run(input, percentageThreshold, featureVectorSize, dropout)
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):
@@ -79,6 +88,13 @@ def evaluate(model, accThresh):
 
 def runCNN1D(inputDrop, flags):
 	global maxAccuracy
+
+	# weights
+	nb_filters = 32
+	# kernel size
+	filter_len = 3
+	# pool size
+	nb_pool = 2
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
 
@@ -139,6 +155,7 @@ def runCNN1D(inputDrop, flags):
 	return (s, acc, timeTaken)
 
 # LSTM from keras document
+# broken for now, will fix soonish
 def runLSTM(inputDrop, flags):
 	global maxAccuracy
 	hidden_units = 100

@@ -7,6 +7,7 @@ from os.path import isfile, join
 from keras.utils import np_utils
 
 # speakerID -> 3D array of feature vectors grouped by file
+# 2D when loaded from pickle. Converted to 3D during loading.
 fileDict = dict()
 # Things that are not from speakers
 # -1: Silences
@@ -42,6 +43,14 @@ def clean():
 	truthVals = dict()
 	testSpeakers = []
 
+
+def pickleDataSet(input, featureVectorSize, pickleName):
+	import cPickle as pickle
+	mfcpp.run(input, percentageThreshold, featureVectorSize, 0)
+	with open("pickles/"+pickleName, 'wb') as f:
+		pickle.dump((mfcpp.fileDict, mfcpp.otherData, mfcpp.truthVals), 
+			f, pickle.HIGHEST_PROTOCOL)	
+
 # rootPath is the string or an array of strings of paths of directories to use
 # Does not peek in to subdirectories
 # percentageThreshold is when to drop a feature vector by how much of it is zero
@@ -49,7 +58,7 @@ def clean():
 # <1% drops for 0.7 
 # >20% for 0.6
 # dropout in the function argument is for dropping files
-def run(rootPath, percentageThreshold, featureVectorSize, windowSize, dropout):
+def run(rootPath, percentageThreshold, featureVectorSize, dropout):
 	global fileDict
 	global otherData
 	global truthVals
@@ -66,7 +75,7 @@ def run(rootPath, percentageThreshold, featureVectorSize, windowSize, dropout):
 		print fileCount, "files found so far."
 		for path in filesThisPath:
 			sid = sinfo.getSpeakerID(path)
-			data = unmfc.returnWindowed(path, featureVectorSize, windowSize)
+			data = unmfc.run(path, featureVectorSize)
 			if sid in fileDict:
 				fileDict[sid].append(data)
 			elif sid in otherData:

@@ -13,7 +13,7 @@ useFreshRngSeeds = True
 # 	Use rnn_mfcc.evaluate() instead of Keras built in accuracy metric
 # saveMaxVer
 # 	Save the best models & weights
-flags = ['returnCustomEvalAccuracy', 'saveMaxVer']
+flags = ['returnCustomEvalAccuracy']#, 'saveMaxVer']
 
 start = time.clock()
 
@@ -21,14 +21,17 @@ avgTime = -1
 avgScore = -1
 avgAcc = -1
 # Uncomment the section(s) to use
+# Positioning determines whether new ones are used each iteration
+# If input dropout is 0, there is no reason to reload the data set
+
 # rnn_mfcc.prepareDataSet(["../SPK_DB/mfc13NoSilences2e5", "../SPK_DB/mfc13OnlySilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
 # rnn_mfcc.prerpareDataSet(["../SPK_DB/mfc13NoSilences2e5", "../SPK_DB/mfc13OnlySilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13OnlySilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
 # rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13noisyNoSilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13noisyOnlySilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1NoSilences8.4e6", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/mfc13Set1OnlySilences8.4e6"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
 # rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/wav16normalizedNoisy", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-Corpus/1234normalized"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
 # rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13)
-rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, dropout = 0.99)
 
 for i in range(numIterations):
+	rnn_mfcc.prepareDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5"], unpredictableSeed = useFreshRngSeeds, featureVectorSize = 13, dropout = 0.9)
 	print "___________________________"
 	print "Starting iteration: ", i+1, " / ", numIterations
 	print "___________________________"
