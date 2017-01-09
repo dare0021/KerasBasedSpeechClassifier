@@ -33,22 +33,28 @@ saveModelsTo = "model"
 maxAccuracy = 0
 onlySaveBestOnes = False;
 
-def windowDict(dic):
-	for k in d.iterkeys():
-		raw = d[k]
-		numcells = len(raw) // windowSize
-		if len(raw) % windowSize > 0:
+def windowDict(dic, featureVectorSize):
+	out = dict()
+	for k in dic.iterkeys():
+		raw = dic[k]
+		frames = []
+		for file in raw:
+			for frame in file:
+				frames.append(frame)
+		numcells = len(frames) // windowSize
+		if len(frames) % windowSize > 0:
 			numcells += 1
-		raw = raw.flatten()
-		raw = np.append(raw, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(raw))))
-		d[k] = raw.reshape(numcells, windowSize, featureVectorSize)
+		frames = np.append(frames, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(frames)*featureVectorSize)))		
+		out[k] = frames.reshape(numcells, windowSize, featureVectorSize)
+	return out
 
 def loadPickledDataSet(pickleName, featureVectorSize):
 	import cPickle as pickle
 	with open("pickles/"+pickleName, 'rb') as f:
 		mfcpp.fileDict, mfcpp.otherData, mfcpp.truthVals = pickle.load(f)
-	windowDict(mfcpp.fileDict)
-	windowDict(mfcpp.otherData)
+	print "LENS", len(mfcpp.fileDict), len(mfcpp.otherData), len(mfcpp.truthVals) 	
+	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
+	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
 
 # input: Directory(ies) where the mfc files are in
 # use dropout to speed up training for whatever reason

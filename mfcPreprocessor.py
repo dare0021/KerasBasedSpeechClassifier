@@ -6,8 +6,10 @@ from os import listdir
 from os.path import isfile, join
 from keras.utils import np_utils
 
-# speakerID -> 3D array of feature vectors grouped by file
-# 2D when loaded from pickle. Converted to 3D during loading.
+# speakerID -> 2D array of feature vectors 
+# fileDict[speakerID] = [frame#][featVect]
+# saved while grouped by file as well
+# fileDict[speakerID] = [file#][frame#][featVect]
 fileDict = dict()
 # Things that are not from speakers
 # -1: Silences
@@ -47,9 +49,9 @@ def clean():
 def pickleDataSet(input, featureVectorSize, pickleName):
 	import cPickle as pickle
 	run(input, featureVectorSize, 0)
-	with open("pickles/"+pickleName, 'wb') as f:
-		pickle.dump((fileDict, otherData, truthVals), 
-			f, pickle.HIGHEST_PROTOCOL)	
+	with open("pickles/"+pickleName, 'w') as f:
+		pickle.dump((fileDict, otherData, truthVals), f, pickle.HIGHEST_PROTOCOL)	
+	print "LENS", len(fileDict), len(otherData), len(truthVals)
 
 # rootPath is the string or an array of strings of paths of directories to use
 # Does not peek in to subdirectories
@@ -108,8 +110,8 @@ def collateData(speakerList):
 			print otherData.keys()
 			assert False
 		for f in data:
-			x.extend(f)
-			y.extend(np.full((len(f)), truthVals[s], dtype='int8'))
+			x.append(f)
+		y.extend(np.full((len(data)), truthVals[s], dtype='int8'))
 	return x, y
 
 # X_train:	input for the training set
@@ -157,7 +159,7 @@ def getSubset(dropout, ratioOfTestsInInput):
 
 	print "Training set:", speakersTrain
 	print "Testing  set:", speakersTest
-	
+
 	return X_train, Y_train, X_test, Y_test
 
 
@@ -170,5 +172,6 @@ def getSubset(dropout, ratioOfTestsInInput):
 # run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
 # print fileDict
 # print truthVals
+# pickleDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab"], 13, "test.pkl")
 # pickleDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5"],
 # 	13, "oscar_clsu7_10_vctk2e5.pkl")
