@@ -37,22 +37,25 @@ def windowDict(dic, featureVectorSize):
 	out = dict()
 	for k in dic.iterkeys():
 		raw = dic[k]
-		frames = []
+		files = []
 		for file in raw:
+			frames = []
 			for frame in file:
 				frames.append(frame)
-		numcells = len(frames) // windowSize
-		if len(frames) % windowSize > 0:
-			numcells += 1
-		frames = np.append(frames, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(frames)*featureVectorSize)))		
-		out[k] = frames.reshape(numcells, windowSize, featureVectorSize)
+			numcells = len(frames) // windowSize
+			if len(frames) % windowSize > 0:
+				numcells += 1
+			flat = np.array(frames).flatten()
+			flat = np.append(flat, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(flat))))
+			files.append(np.array(flat).reshape(numcells, windowSize, featureVectorSize))
+		out[k] = files
 	return out
 
 def loadPickledDataSet(pickleName, featureVectorSize):
 	import cPickle as pickle
 	with open("pickles/"+pickleName, 'rb') as f:
 		mfcpp.fileDict, mfcpp.otherData, mfcpp.truthVals = pickle.load(f)
-	print "LENS", len(mfcpp.fileDict), len(mfcpp.otherData), len(mfcpp.truthVals) 	
+	print "LENS", len(mfcpp.fileDict), len(mfcpp.otherData), len(mfcpp.truthVals)
 	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
 	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
 

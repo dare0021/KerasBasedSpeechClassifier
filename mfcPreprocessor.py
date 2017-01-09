@@ -6,9 +6,7 @@ from os import listdir
 from os.path import isfile, join
 from keras.utils import np_utils
 
-# speakerID -> 2D array of feature vectors 
-# fileDict[speakerID] = [frame#][featVect]
-# saved while grouped by file as well
+# speakerID -> 3D array of feature vectors Zz
 # fileDict[speakerID] = [file#][frame#][featVect]
 fileDict = dict()
 # Things that are not from speakers
@@ -110,8 +108,8 @@ def collateData(speakerList):
 			print otherData.keys()
 			assert False
 		for f in data:
-			x.append(f)
-		y.extend(np.full((len(data)), truthVals[s], dtype='int8'))
+			x.extend(f)
+			y.extend(np.full((len(f)), truthVals[s], dtype='int8'))
 	return x, y
 
 # X_train:	input for the training set
