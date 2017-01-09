@@ -44,21 +44,19 @@ def clean():
 	testSpeakers = []
 
 
-def pickleDataSet(input, percentageThreshold, featureVectorSize, pickleName):
+def pickleDataSet(input, featureVectorSize, pickleName):
 	import cPickle as pickle
-	run(input, percentageThreshold, featureVectorSize, 0)
+	run(input, featureVectorSize, 0)
 	with open("pickles/"+pickleName, 'wb') as f:
 		pickle.dump((fileDict, otherData, truthVals), 
 			f, pickle.HIGHEST_PROTOCOL)	
 
 # rootPath is the string or an array of strings of paths of directories to use
 # Does not peek in to subdirectories
-# percentageThreshold is when to drop a feature vector by how much of it is zero
-# not implemented in this version
 # <1% drops for 0.7 
 # >20% for 0.6
 # dropout in the function argument is for dropping files
-def run(rootPath, percentageThreshold, featureVectorSize, dropout):
+def run(rootPath, featureVectorSize, dropout):
 	global fileDict
 	global otherData
 	global truthVals
@@ -172,5 +170,5 @@ def getSubset(dropout, ratioOfTestsInInput):
 # run("/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13")
 # print fileDict
 # print truthVals
-pickleDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5"],
-	0.0, 13, "oscar_clsu7_10_vctk2e5.pkl")
+# pickleDataSet(["/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/oscaar_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/CSLU-7to10auda_matlab", "/media/jkih/4A98B4D598B4C12D/Users/jkih/Desktop/VCTK-Corpus/mfc13NoSilences2e5"],
+# 	13, "oscar_clsu7_10_vctk2e5.pkl")

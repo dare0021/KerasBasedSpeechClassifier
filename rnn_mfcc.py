@@ -13,8 +13,6 @@ import speakerInfo as sinfo
 
 # Ratio of tests vs input. Training set is (1 - this) of the input.
 ratioOfTestsInInput = 0.1
-# Cull samples which have <= this ratio of data points as non-zero values
-percentageThreshold = 0.0
 
 # number of samples before weight update
 batch_size = 128
@@ -58,7 +56,7 @@ def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
-	mfcpp.run(input, percentageThreshold, featureVectorSize, dropout)
+	mfcpp.run(input, featureVectorSize, dropout)
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):
