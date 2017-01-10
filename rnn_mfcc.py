@@ -33,6 +33,7 @@ saveModelsTo = "model"
 maxAccuracy = 0
 onlySaveBestOnes = False;
 
+# dictionaries are passed by value
 def windowDict(dic, featureVectorSize):
 	out = dict()
 	for k in dic.iterkeys():
@@ -165,8 +166,7 @@ def runCNN1D(inputDrop, flags):
 # broken for now, will fix soonish
 def runLSTM(inputDrop, flags):
 	global maxAccuracy
-	hidden_units = 100
-	nb_classes = 10
+	hidden_units = 1
 	batch_size_lstm=1
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
@@ -179,10 +179,10 @@ def runLSTM(inputDrop, flags):
 	model = Sequential()
 
 	model.add(LSTM(output_dim=hidden_units, init='uniform', inner_init='uniform', 
-		forget_bias_init='one', activation='tanh', inner_activation='sigmoid', return_sequences=True,
-		batch_input_shape=(batch_size_lstm, windowSize, X_train.shape[2])))
+		forget_bias_init='one', activation='relu', return_sequences=True,
+		batch_input_shape=(batch_size_lstm, windowSize, X_train.shape[-1])))
 
-	model.add(Dropout(0.1))
+	model.add(Dropout(0.2))
 
 	model.add(Flatten())
 	model.add(Dense(256, activation='relu'))
@@ -223,4 +223,4 @@ def runLSTM(inputDrop, flags):
 
 	return (s, acc, timeTaken)
 
-run = runCNN1D
+run = runLSTM
