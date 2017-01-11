@@ -16,12 +16,16 @@ input = "inputData/MF/F"
 output = "inputData/clean/outC.txt"
 
 # The ground truth value
-targetClass = 0
+targetClass = 1
 
 unpredictableSeed = True
 featureVectorSize = 13
+# should be the same one used during training
 windowSize = 100
-inputDrop = 0
+# drop rate for the whole data set
+inputDropWhole = 0
+# drop rate for each time the model is run
+inputDropIter = 0
 
 # ====================================
 # Internal logic variables
@@ -33,9 +37,37 @@ def evaluate(vect):
 		return 0
 	return 1
 
+# dictionaries are passed by value
+def windowDict(dic, featureVectorSize):
+	out = dict()
+	for k in dic.iterkeys():
+		raw = dic[k]
+		files = []
+		for file in raw:
+			frames = []
+			for frame in file:
+				frames.append(frame)
+			numcells = len(frames) // windowSize
+			if len(frames) % windowSize > 0:
+				numcells += 1
+			flat = np.array(frames).flatten()
+			flat = np.append(flat, np.zeros(shape=(numcells*windowSize*featureVectorSize - len(flat))))
+			files.append(np.array(flat).reshape(numcells, windowSize, featureVectorSize))
+		out[k] = files
+	return out
+
 def generateOutput(model, parentDir):
-	mfcpp.run(parentDir, featureVectorSize, windowSize)
-	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, 1)
+	mfcpp.run(parentDir, featureVectorSize, inputDropWhole)
+	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
+	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
+
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDropIter, 1)
+
+	print "X_train", X_train.shape
+	print "Y_train", Y_train.shape
+	print "X_test", X_test.shape
+	print "Y_test", Y_test.shape
+	
 	return model.predict_proba(X_test)
 
 def saveGeneratedData(data, path):
@@ -114,4 +146,4 @@ def multiRun(input, output, weightsFolder):
 
 # run(input, output)
 # change the targetClass variable 0 - adult, 1 - child
-multiRun("inputData/sukwoo/A", "saves/2017jan.Feasibility/A", "saves/2017jan.Feasibility/weights")
+multiRun("inputData/sukwoo/C", "saves/2017jan.Feasibility/C", "saves/2017jan.Feasibility/weights")

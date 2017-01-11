@@ -67,6 +67,8 @@ def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0):
 	if not unpredictableSeed:
 		np.random.seed(1337)
 	mfcpp.run(input, featureVectorSize, dropout)
+	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
+	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):
@@ -90,7 +92,7 @@ def evaluate(model, accThresh):
 		# parse the resultant accuracy (score[1]) as a correct or incorrect outcome
 	# return the ratio of correct outcomes
 
-# Call prepareDataSet() first
+# Call prepareDataSet() or loadPickledDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
 

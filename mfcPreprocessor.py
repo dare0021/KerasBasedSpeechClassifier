@@ -6,7 +6,7 @@ from os import listdir
 from os.path import isfile, join
 from keras.utils import np_utils
 
-# speakerID -> 3D array of feature vectors Zz
+# speakerID -> 3D array of feature vectors
 # fileDict[speakerID] = [file#][frame#][featVect]
 fileDict = dict()
 # Things that are not from speakers
@@ -53,8 +53,6 @@ def pickleDataSet(input, featureVectorSize, pickleName):
 
 # rootPath is the string or an array of strings of paths of directories to use
 # Does not peek in to subdirectories
-# <1% drops for 0.7 
-# >20% for 0.6
 # dropout in the function argument is for dropping files
 def run(rootPath, featureVectorSize, dropout):
 	global fileDict
