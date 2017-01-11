@@ -17,7 +17,7 @@ ratioOfTestsInInput = 0.1
 # number of samples before weight update
 batch_size = 128
 # how many iterations to run
-nb_epoch = 10
+nb_epoch = 25
 # how to bundle the MFCC vectors
 windowSize = 100
 # Files with accuracy above this are counted as correct
@@ -162,65 +162,7 @@ def runCNN1D(inputDrop, flags):
 
 	return (s, acc, timeTaken)
 
-# LSTM from keras document
-# broken for now, will fix soonish
-def runLSTM(inputDrop, flags):
-	global maxAccuracy
-	hidden_units = 1
-	batch_size_lstm=1
+def runCNN2D(inputDrop, flags):
+	pass
 
-	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
-
-	print "X_train", X_train.shape
-	print "Y_train", Y_train.shape
-	print "X_test", X_test.shape
-	print "Y_test", Y_test.shape
-
-	model = Sequential()
-
-	model.add(LSTM(output_dim=hidden_units, init='uniform', inner_init='uniform', 
-		forget_bias_init='one', activation='relu', return_sequences=True,
-		batch_input_shape=(batch_size_lstm, windowSize, X_train.shape[-1])))
-
-	model.add(Dropout(0.2))
-
-	model.add(Flatten())
-	model.add(Dense(256, activation='relu'))
-	model.add(Dropout(0.5))
-	model.add(Dense(sinfo.getNbClasses(), activation='softmax'))
-
-	model.compile(loss='categorical_crossentropy',
-	              optimizer='adadelta',
-	              metrics=['accuracy'])
-
-	model.fit(X_train, Y_train, batch_size=batch_size_lstm, nb_epoch=nb_epoch,
-			verbose=2, validation_data=(X_test, Y_test))
-	
-	score = [0, 0]
-
-	if ratioOfTestsInInput > 0:
-		score = model.evaluate(X_test, Y_test, verbose=0)
-	timeTaken = time.clock() - start
-
-	print('Time taken:', timeTaken)
-	print('Test score:', score[0])
-	print('Test accuracy:', score[1])
-
-	s = score[0]
-	acc = score[1]
-	if 'returnCustomEvalAccuracy' in flags:
-		s = -1
-		acc = evaluate(model, evaluateAccuracy)
-		print('Evaluator accuracy:', acc)
-	if 'saveMaxVer' in flags and ((not onlySaveBestOnes) or maxAccuracy < acc):
-		if maxAccuracy < acc:
-			maxAccuracy = acc
-		import os
-		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
-		jsonData = model.to_json()
-		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
-			f.write(jsonData)
-
-	return (s, acc, timeTaken)
-
-run = runLSTM
+run = runCNN1D

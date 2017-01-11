@@ -19,7 +19,6 @@ output = "inputData/clean/outC.txt"
 targetClass = 0
 
 unpredictableSeed = True
-percentageThreshold = 0.7
 featureVectorSize = 13
 windowSize = 100
 inputDrop = 0
@@ -35,7 +34,7 @@ def evaluate(vect):
 	return 1
 
 def generateOutput(model, parentDir):
-	mfcpp.run(parentDir, percentageThreshold, featureVectorSize, windowSize)
+	mfcpp.run(parentDir, featureVectorSize, windowSize)
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, 1)
 	return model.predict_proba(X_test)
 
@@ -115,4 +114,4 @@ def multiRun(input, output, weightsFolder):
 
 # run(input, output)
 # change the targetClass variable 0 - adult, 1 - child
-multiRun("inputData/AC/all/C1A1_SC3", "saveData_AC100_0.1/AC/all/C1A1_SC3", "saveData_AC100_0.1/weights")
+multiRun("inputData/sukwoo/A", "saves/2017jan.Feasibility/A", "saves/2017jan.Feasibility/weights")

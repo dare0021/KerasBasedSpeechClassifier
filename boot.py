@@ -15,7 +15,9 @@ inputDrop = 0.0
 # 	Use rnn_mfcc.evaluate() instead of Keras built in accuracy metric
 # saveMaxVer
 # 	Save the best models & weights
-flags = ['returnCustomEvalAccuracy']#, 'saveMaxVer']
+flags = [
+# 'returnCustomEvalAccuracy', 
+'saveMaxVer']
 
 start = time.clock()
 
