@@ -16,7 +16,7 @@ input = "inputData/MF/F"
 output = "inputData/clean/outC.txt"
 
 # The ground truth value
-targetClass = 1
+targetClass = 0
 
 unpredictableSeed = True
 featureVectorSize = 13
@@ -146,4 +146,4 @@ def multiRun(input, output, weightsFolder):
 
 # run(input, output)
 # change the targetClass variable 0 - adult, 1 - child
-multiRun("inputData/sukwoo/C", "saves/2017jan.Feasibility/C", "saves/2017jan.Feasibility/weights")
+multiRun("inputData/AC/junhong/C1A1_SC1_A", "saves/2017jan.Feasibility/junhong.c1a1sc1.A", "saves/2017jan.Feasibility/weights")

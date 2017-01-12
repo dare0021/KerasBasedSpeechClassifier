@@ -2,22 +2,26 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import os
 from scipy import stats
+from collections import Counter
 import matplotlib.pyplot as plt
 
 cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60A_dither.txt"
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60C_dither.txt"
-projectFolder = "/home/jkih/projects/KerasBasedSpeechClassifier/"
+projectFolder = "/home/jkih/projects/KerasBasedSpeechClassifier/saves/"
 
 input = projectFolder + "saveData_MF300_0.1/F_cnn/0.911034900141.txt"
-target = 1
+inputFolder = projectFolder + "2017jan.Feasibility/junhong.c1a1sc1.A"
+target = 0
 # 1 frame is 10ms
 windowSize = 10
 
 data = []
 dataMax = []
+truthVals = []
 
-def readData(intput):
+def readData(input):
 	global data
 	data = []
 	f = open(input, 'r')
@@ -103,6 +107,7 @@ def getConfidenceDifferential(target):
 def getAccuracy(silentTreatment, target):
 	global data
 	assert len(data) > 0
+	assert len(truthVals) < 1
 	sum = 0.0
 	total = len(data)
 	if silentTreatment == "ignore silence":
@@ -133,6 +138,8 @@ def getAccuracy(silentTreatment, target):
 def getFuzzyAccuracy(nb_classes, fuzziness, target, dropSilence = False):
 	global data
 	assert len(data) > 0
+	assert len(truthVals) < 1
+	truthVal = []
 	import fuzzyHelper as fuzzball
 	fuzzball.init(nb_classes, fuzziness)
 	sum = 0.0
@@ -141,6 +148,7 @@ def getFuzzyAccuracy(nb_classes, fuzziness, target, dropSilence = False):
 		max = np.argmax(arr)
 		if dropSilence and max == 2:
 			continue
+		truthVals.append(max)
 		if fuzzball.push(np.argmax(arr)) == target:
 			sum += 1
 		total += 1
@@ -219,17 +227,53 @@ def getStats(verbose = True):
 		print "median", median
 	return stddev, mean, median
 
-readData(input)
-getAccuracy("ignore silence", target)
-getAccuracy("silence drop", target)
-getAccuracy("strictly no silence", target)
-getStats()
-getSlidingWindowModeAccuracy(windowSize, target)
-getSlidingWindowAverageAccuracy(windowSize, target)
-getFuzzyAccuracy(3, 1, target)
-getFuzzyAccuracy(3, 2, target)
-getFuzzyAccuracy(3, 3, target)
-getConfidenceDifferential(target)
+# Looks at the results of the different models and forms a result based on all of them
+def democraticAccuracy(inputFolder, target, modeString):
+	global truthVals
+
+	files = [inputFolder + "/" + f for f in os.listdir(inputFolder) if os.path.isfile(os.path.join(inputFolder, f)) and f.endswith(".txt") and not f[0]=='_']
+
+	# 2D array
+	# [file][frame] = truthVal
+	truthArr = []
+	for path in files:
+		readData(path)
+		truthVals = []
+		if modeString == "fuzzy":
+			getFuzzyAccuracy(2, 3, target)
+			truthArr.append(truthVals)
+		elif modeString == "raw":
+			getMax(2)
+			truthArr.append(dataMax)
+		else:
+			print "invalid modeString", modeString
+			assert(False)
+	truthArr = np.array(truthArr)
+	modes = []
+	for i in range(len(truthArr[0])):
+		thisCol = truthArr[:, i]
+		modeCounter = Counter(thisCol)
+		modes.append(modeCounter.most_common(1)[0][0])
+	sum = 0
+	for i in modes:
+		if i == target:
+			sum += 1
+	print float(sum) / len(modes)
+
+
+
+# readData(input)
+# getAccuracy("ignore silence", target)
+# getAccuracy("silence drop", target)
+# getAccuracy("strictly no silence", target)
+# getStats()
+# getSlidingWindowModeAccuracy(windowSize, target)
+# getSlidingWindowAverageAccuracy(windowSize, target)
+# getFuzzyAccuracy(3, 1, target)
+# getFuzzyAccuracy(3, 2, target)
+# getFuzzyAccuracy(3, 3, target)
+# getConfidenceDifferential(target)
 # getRawGraph(3)
 # getFuzzyGraph(3, 3)
 # getCompressedGraph(3,3)
+democraticAccuracy(inputFolder, target, "fuzzy")
