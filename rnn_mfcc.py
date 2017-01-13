@@ -17,7 +17,7 @@ ratioOfTestsInInput = 0.1
 # number of samples before weight update
 batch_size = 128
 # how many iterations to run
-nb_epoch = 25
+nb_epoch = 100
 # how to bundle the MFCC vectors
 windowSize = 100
 # Files with accuracy above this are counted as correct

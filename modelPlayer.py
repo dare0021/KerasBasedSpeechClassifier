@@ -146,4 +146,4 @@ def multiRun(input, output, weightsFolder):
 
 # run(input, output)
 # change the targetClass variable 0 - adult, 1 - child
-multiRun("inputData/AC/junhong/C1A1_SC1_A", "saves/2017jan.Feasibility/junhong.c1a1sc1.A", "saves/2017jan.Feasibility/weights")
+multiRun("inputData/AC/junhong/C1A1_SC1_A", "saves/2017jan.Feasibility/100epochs/junhongc1a1sc1a", "saves/2017jan.Feasibility/weights_100epoch")
