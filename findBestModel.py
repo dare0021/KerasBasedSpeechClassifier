@@ -11,6 +11,18 @@ projectFolder = parentFolder + "2017jan.Feasibility/25epochs/"
 
 inputFolders = [projectFolder+"junhong.c1a1sc1.A", projectFolder+"junhong.c1a1sc1.C"]
 
+def rms(input):
+	sum = 0
+	for v in input:
+		sum += v * v
+	sum /= float(len(input))
+	return sum ** 0.5
+
+def simpleMean(input):
+	return np.array(input).mean()
+
+evaluator = rms
+
 def run(inputFolders):
 	accuracyArr = []
 	for folderPath in inputFolders:
@@ -42,11 +54,11 @@ def run(inputFolders):
 				iterList.append(dic[key])
 		if not allPresent:
 			continue
-		result = np.array(iterList).mean()
+		result = evaluator(iterList)
 		if result > maxval:
 			maxval = result
 			maxkey = key
 			maxarr = iterList
-	print maxkey, maxval, iterList
+	print maxkey, evaluator, maxval, iterList
 
 run(inputFolders)
