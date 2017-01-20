@@ -5,7 +5,6 @@ import struct
 # takes file path as input
 # Sphinx uses feature vectors of length 13 by default
 def run(input, featureVectorSize):
-	sign = 1;
 	file = open(input, 'r')
 	size = struct.unpack('>i', ''.join(file.read(4)))[0]
 	if ((float)(size)) / featureVectorSize - (float)(size // featureVectorSize) != 0:
