@@ -11,7 +11,7 @@ cj60ba = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60A_dither.
 cj60bc = "/home/jkih/projects/KerasBasedSpeechClassifier/inputData/CJ60C_dither.txt"
 projectFolder = "/home/jkih/projects/KerasBasedSpeechClassifier/saves/"
 
-input = projectFolder + "saveData_MF300_0.1/F_cnn/0.911034900141.txt"
+input = projectFolder + "2017jan.Feasibility/50epochs/junhongc2a2sc2c/0.721443040428.txt"
 inputFolder = projectFolder + "2017jan.Feasibility/junhong.c1a1sc1.A"
 target = 0
 # 1 frame is 10ms
@@ -262,18 +262,18 @@ def democraticAccuracy(inputFolder, target, modeString):
 
 
 
-# readData(input)
+readData(input)
 # getAccuracy("ignore silence", target)
 # getAccuracy("silence drop", target)
 # getAccuracy("strictly no silence", target)
-# getStats()
+getStats()
 # getSlidingWindowModeAccuracy(windowSize, target)
 # getSlidingWindowAverageAccuracy(windowSize, target)
 # getFuzzyAccuracy(3, 1, target)
 # getFuzzyAccuracy(3, 2, target)
 # getFuzzyAccuracy(3, 3, target)
 # getConfidenceDifferential(target)
-# getRawGraph(3)
+getRawGraph(2)
 # getFuzzyGraph(3, 3)
 # getCompressedGraph(3,3)
-democraticAccuracy(inputFolder, target, "fuzzy")
+# democraticAccuracy(inputFolder, target, "fuzzy")

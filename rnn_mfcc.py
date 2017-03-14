@@ -17,7 +17,7 @@ ratioOfTestsInInput = 0.1
 # number of samples before weight update
 batch_size = 128
 # how many iterations to run
-nb_epoch = 100
+nb_epoch = 10000
 # how to bundle the MFCC vectors
 windowSize = 100
 # Files with accuracy above this are counted as correct
@@ -52,6 +52,8 @@ def windowDict(dic, featureVectorSize):
 		out[k] = files
 	return out
 
+# Loads compacted data set
+# Use mfcPreprocessor.pickleDataSet() to create pickles
 def loadPickledDataSet(pickleName, featureVectorSize):
 	import cPickle as pickle
 	with open("pickles/"+pickleName, 'rb') as f:
@@ -60,6 +62,7 @@ def loadPickledDataSet(pickleName, featureVectorSize):
 	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
 	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
 
+# Loads data as is
 # input: Directory(ies) where the mfc files are in
 # use dropout to speed up training for whatever reason
 def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0):
