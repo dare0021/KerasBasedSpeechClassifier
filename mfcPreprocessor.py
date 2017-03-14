@@ -166,6 +166,8 @@ def getSubset(dropout, ratioOfTestsInInput):
 		testSpeakers = speakersTest
 		speakersTrain = savedSpeakerList[:nextTestSpeaker] + savedSpeakerList[nextTestSpeaker+1:]
 		nextTestSpeaker += 1
+		if nextTestSpeaker >= len(savedSpeakerList):
+			nextTestSpeaker = 0
 
 	else:
 		print "invalid samplingMode at mfcPreprocessor.getSubset()", samplingMode
