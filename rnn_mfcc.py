@@ -54,24 +54,26 @@ def windowDict(dic, featureVectorSize):
 
 # Loads compacted data set
 # Use mfcPreprocessor.pickleDataSet() to create pickles
-def loadPickledDataSet(pickleName, featureVectorSize):
+def loadPickledDataSet(pickleName, featureVectorSize, samplingMode="random"):
 	import cPickle as pickle
 	with open("pickles/"+pickleName, 'rb') as f:
 		mfcpp.fileDict, mfcpp.otherData, mfcpp.truthVals = pickle.load(f)
 	print "LENS", len(mfcpp.fileDict), len(mfcpp.otherData), len(mfcpp.truthVals)
 	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
 	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
+	mfcpp.samplingMode = samplingMode
 
 # Loads data as is
 # input: Directory(ies) where the mfc files are in
 # use dropout to speed up training for whatever reason
-def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0):
+def prepareDataSet(input, unpredictableSeed, featureVectorSize, dropout=0.0, samplingMode="random"):
 	# for reproducibility
 	if not unpredictableSeed:
 		np.random.seed(1337)
 	mfcpp.run(input, featureVectorSize, dropout)
 	mfcpp.fileDict = windowDict(mfcpp.fileDict, featureVectorSize)
 	mfcpp.otherData = windowDict(mfcpp.otherData, featureVectorSize)
+	mfcpp.samplingMode = samplingMode
 
 # Evaluation function for collating the files' various time steps' predictions
 def evaluate(model, accThresh):

@@ -14,8 +14,16 @@ fileDict = dict()
 otherData = dict()
 otherDataKeys = []
 truthVals = dict()
-
 testSpeakers = []
+initialSamplingMode = "random"
+nextTestSpeaker = 0
+# for using dropout with deterministic sampling
+savedSpeakerList = []
+
+# decides how the test set will be chosen
+# random
+# oneAtATime
+samplingMode = initialSamplingMode
 
 sidKeyType = sinfo.getSIDKeyType()
 if "int" == sidKeyType:
@@ -37,11 +45,15 @@ def clean():
 	global otherDataKeys
 	global truthVals
 	global testSpeakers
+	global samplingMode
+	global nextTestSpeaker
 	fileDict = dict()
 	otherData = dict()
 	otherDataKeys = []
 	truthVals = dict()
 	testSpeakers = []
+	samplingMode = initialSamplingMode
+	nextTestSpeaker = 0
 
 
 def pickleDataSet(input, featureVectorSize, pickleName):
@@ -122,6 +134,7 @@ def getSubset(dropout, ratioOfTestsInInput):
 	global otherData
 	global truthVals
 	global testSpeakers
+	global nextTestSpeaker
 
 	# generate chosen speakers
 		# randomly drop speakers
@@ -131,15 +144,31 @@ def getSubset(dropout, ratioOfTestsInInput):
 		# X set should be [None, 1, freq, 1]
 		# Y set should be [None, 1] and match the X set in cardinality
 
-	speakerList = [s for s in fileDict if np.random.uniform(0,1) > dropout]
-	np.random.shuffle(speakerList)
+	if len(savedSpeakerList) == 0:
+		# init
+		savedSpeakerList = [s for s in fileDict if np.random.uniform(0,1) >= dropout]
 
-	if ratioOfTestsInInput == 1:
-		trainListSize = 0
+	if samplingMode == "random":
+		np.random.shuffle(savedSpeakerList)
+		if ratioOfTestsInInput == 1:
+			trainListSize = 0
+		else:
+			trainListSize = len(savedSpeakerList) // (1 / (1 - ratioOfTestsInInput))
+		speakersTrain, speakersTest = np.split(savedSpeakerList, [trainListSize])
+		testSpeakers = speakersTest
+
+	elif samplingMode == "oneAtATime":
+		if nextTestSpeaker == 0:
+			# init
+			np.random.shuffle(savedSpeakerList)
+		speakersTest = [savedSpeakerList[nextTestSpeaker]]
+		testSpeakers = speakersTest
+		speakersTrain = savedSpeakerList[:nextTestSpeaker] + savedSpeakerList[nextTestSpeaker+1:]
+		nextTestSpeaker += 1
+
 	else:
-		trainListSize = len(speakerList) // (1 / (1 - ratioOfTestsInInput))
-	speakersTrain, speakersTest = np.split(speakerList, [trainListSize])
-	testSpeakers = speakersTest
+		print "invalid samplingMode at mfcPreprocessor.getSubset()", samplingMode
+		assert False
 
 	otherGroup = []
 	otherGroup.extend(otherData)
