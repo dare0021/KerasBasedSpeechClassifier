@@ -3,7 +3,7 @@ import rnn_mfcc
 import rnn_raw
 
 # Number of iterations of traning / testing sets to run
-numIterations = 10
+numIterations = 20
 
 # If false will use seed "1337" instead of current time
 useFreshRngSeeds = True

@@ -135,6 +135,7 @@ def getSubset(dropout, ratioOfTestsInInput):
 	global truthVals
 	global testSpeakers
 	global nextTestSpeaker
+	global savedSpeakerList
 
 	# generate chosen speakers
 		# randomly drop speakers
