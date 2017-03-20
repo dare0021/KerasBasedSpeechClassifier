@@ -3,7 +3,7 @@ import rnn_mfcc
 import rnn_raw
 
 # Number of iterations of traning / testing sets to run
-numIterations = 20
+numIterations = 100*10
 
 # If false will use seed "1337" instead of current time
 useFreshRngSeeds = True
@@ -17,7 +17,8 @@ inputDrop = 0.0
 # 	Save the best models & weights
 flags = [
 # 'returnCustomEvalAccuracy', 
-'saveMaxVer']
+# 'saveMaxVer'
+]
 
 start = time.clock()
 

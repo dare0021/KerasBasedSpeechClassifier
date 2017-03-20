@@ -53,7 +53,7 @@ def clean():
 	truthVals = dict()
 	testSpeakers = []
 	samplingMode = initialSamplingMode
-	nextTestSpeaker = 0
+	nextTestSpeaker = -1
 
 
 def pickleDataSet(input, featureVectorSize, pickleName):
@@ -159,7 +159,7 @@ def getSubset(dropout, ratioOfTestsInInput):
 		testSpeakers = speakersTest
 
 	elif samplingMode == "oneAtATime":
-		if nextTestSpeaker == 0:
+		if nextTestSpeaker == -1:
 			# init
 			np.random.shuffle(savedSpeakerList)
 		speakersTest = [savedSpeakerList[nextTestSpeaker]]

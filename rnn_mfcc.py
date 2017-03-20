@@ -17,7 +17,7 @@ ratioOfTestsInInput = 0.1
 # number of samples before weight update
 batch_size = 128
 # how many iterations to run
-nb_epoch = 1
+nb_epoch = 75
 # how to bundle the MFCC vectors
 windowSize = 100
 # Files with accuracy above this are counted as correct
@@ -142,7 +142,7 @@ def runCNN1D(inputDrop, flags):
 	# Verbose 1: Output each batch
 	# Verbose 2: Output each epoch
 	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
-	          verbose=2, validation_data=(X_test, Y_test))
+	          verbose=0, validation_data=(X_test, Y_test))
 	score = [0, 0]
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
