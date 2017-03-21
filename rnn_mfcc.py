@@ -99,7 +99,7 @@ def evaluate(model, accThresh):
 		# parse the resultant accuracy (score[1]) as a correct or incorrect outcome
 	# return the ratio of correct outcomes
 
-def formatOutput(model, score, startTime):
+def formatOutput(model, score, startTime, flags):
 	global maxAccuracy
 
 	timeTaken = time.clock() - startTime
@@ -122,7 +122,7 @@ def formatOutput(model, score, startTime):
 		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
 			f.write(jsonData)
 
-	return (s, acc, timeTaken)
+	return (s, acc, timeTaken, flags)
 
 # Call prepareDataSet() or loadPickledDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
@@ -222,6 +222,6 @@ def runCNN2D(inputDrop, flags):
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
 	
-	return formatOutput(model, score, start)
+	return formatOutput(model, score, start, flags)
 
 run = runCNN2D
