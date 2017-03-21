@@ -183,8 +183,9 @@ def runCNN2D(inputDrop, flags):
 	nb_pool = 2
 
 	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
-	X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[-1], 1))
-	X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[-1], 1))
+	featureVectorSize = X_train.shape[-1]
+	X_train = np.reshape(X_train, (-1, windowSize, X_train.shape[-1], 1))
+	X_test = np.reshape(X_test, (-1, windowSize, X_test.shape[-1], 1))
 
 	print "X_train", X_train.shape
 	print "Y_train", Y_train.shape
@@ -195,7 +196,7 @@ def runCNN2D(inputDrop, flags):
 
 	model.add(Conv2D(nb_filters, (filter_len, filter_len),
 					 # treat input as a 2D greyscale image
-	                 input_shape=(windowSize, X_train.shape[-1], 1),
+	                 input_shape=(windowSize, featureVectorSize, 1),
 	                 activation='relu'))
 	model.add(Dropout(0.2))
 	model.add(Conv2D(nb_filters, (filter_len, filter_len), activation='relu'))
@@ -216,11 +217,11 @@ def runCNN2D(inputDrop, flags):
 	# Verbose 1: Output each batch
 	# Verbose 2: Output each epoch
 	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
-	          verbose=0, validation_data=(X_test, Y_test))
+	          verbose=2, validation_data=(X_test, Y_test))
 	score = [0, 0]
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
 	
 	return formatOutput(score, start)
 
-run = runCNN1D
+run = runCNN2D
