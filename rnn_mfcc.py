@@ -172,7 +172,7 @@ def runCNN1D(inputDrop, flags):
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
 	
-	return formatOutput(score, time.clock() - start)
+	return formatOutput(model, score, start)
 
 def runCNN2D(inputDrop, flags):
 	# weights
@@ -222,6 +222,6 @@ def runCNN2D(inputDrop, flags):
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
 	
-	return formatOutput(score, start)
+	return formatOutput(model, score, start)
 
 run = runCNN2D
