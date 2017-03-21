@@ -166,7 +166,7 @@ def runCNN1D(inputDrop, flags):
 	# Verbose 0: No output while processing
 	# Verbose 1: Output each batch
 	# Verbose 2: Output each epoch
-	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+	model.fit(X_train, Y_train, batch_size=batch_size, epochs=nb_epoch,
 	          verbose=0, validation_data=(X_test, Y_test))
 	score = [0, 0]
 	if ratioOfTestsInInput > 0:
@@ -216,7 +216,7 @@ def runCNN2D(inputDrop, flags):
 	# Verbose 0: No output while processing
 	# Verbose 1: Output each batch
 	# Verbose 2: Output each epoch
-	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+	model.fit(X_train, Y_train, batch_size=batch_size, epochs=nb_epoch,
 	          verbose=2, validation_data=(X_test, Y_test))
 	score = [0, 0]
 	if ratioOfTestsInInput > 0:
