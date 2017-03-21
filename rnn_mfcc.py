@@ -17,7 +17,7 @@ ratioOfTestsInInput = 0.1
 # number of samples before weight update
 batch_size = 128
 # how many iterations to run
-nb_epoch = 75
+nb_epoch = 50
 # how to bundle the MFCC vectors
 windowSize = 100
 # Files with accuracy above this are counted as correct
@@ -97,13 +97,35 @@ def evaluate(model, accThresh):
 		# parse the resultant accuracy (score[1]) as a correct or incorrect outcome
 	# return the ratio of correct outcomes
 
+def formatOutput(model, score, timeTaken):
+	global maxAccuracy
+
+	print('Time taken:', timeTaken)
+	print('Test score:', score[0])
+	print('Test accuracy:', score[1])
+
+	s = score[0]
+	acc = score[1]
+	if 'returnCustomEvalAccuracy' in flags:
+		s = -1
+		acc = evaluate(model, evaluateAccuracy)
+		print('Evaluator accuracy:', acc)
+	if 'saveMaxVer' in flags and ((not onlySaveBestOnes) or maxAccuracy < acc):
+		if maxAccuracy < acc:
+			maxAccuracy = acc
+		import os
+		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
+		jsonData = model.to_json()
+		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
+			f.write(jsonData)
+
+	return (s, acc, timeTaken)
+
 # Call prepareDataSet() or loadPickledDataSet() first
 # inputDrop is how much of the input to drop as a ratio [0,1]
 # decayLR:	The learning rate to use for time-based LR scheduling. 0 means no decay.
 
 def runCNN1D(inputDrop, flags):
-	global maxAccuracy
-
 	# weights
 	nb_filters = 32
 	# kernel size
@@ -146,28 +168,8 @@ def runCNN1D(inputDrop, flags):
 	score = [0, 0]
 	if ratioOfTestsInInput > 0:
 		score = model.evaluate(X_test, Y_test, verbose=0)
-	timeTaken = time.clock() - start
-
-	print('Time taken:', timeTaken)
-	print('Test score:', score[0])
-	print('Test accuracy:', score[1])
-
-	s = score[0]
-	acc = score[1]
-	if 'returnCustomEvalAccuracy' in flags:
-		s = -1
-		acc = evaluate(model, evaluateAccuracy)
-		print('Evaluator accuracy:', acc)
-	if 'saveMaxVer' in flags and ((not onlySaveBestOnes) or maxAccuracy < acc):
-		if maxAccuracy < acc:
-			maxAccuracy = acc
-		import os
-		model.save_weights(saveWeightsTo + "_" + str(acc) + ".h5", overwrite = True)
-		jsonData = model.to_json()
-		with open (saveModelsTo + "_" + str(acc) + ".json", 'w') as f:
-			f.write(jsonData)
-
-	return (s, acc, timeTaken)
+	
+	return formatOutput(score, time.clock() - start)
 
 def runCNN2D(inputDrop, flags):
 	pass
