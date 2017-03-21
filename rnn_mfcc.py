@@ -1,6 +1,8 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Convolution1D, MaxPooling1D
+# There may come a time when we have to put these in to their respective functions
+from keras.layers import Conv1D, MaxPooling1D
+from keras.layers import Conv2D, MaxPooling2D
 from keras.utils import np_utils
 
 from keras.layers import Embedding
@@ -97,9 +99,10 @@ def evaluate(model, accThresh):
 		# parse the resultant accuracy (score[1]) as a correct or incorrect outcome
 	# return the ratio of correct outcomes
 
-def formatOutput(model, score, timeTaken):
+def formatOutput(model, score, startTime):
 	global maxAccuracy
 
+	timeTaken = time.clock() - startTime
 	print('Time taken:', timeTaken)
 	print('Test score:', score[0])
 	print('Test accuracy:', score[1])
@@ -142,11 +145,11 @@ def runCNN1D(inputDrop, flags):
 
 	model = Sequential()
 
-	model.add(Convolution1D(nb_filters, filter_len,
-	                        input_shape=(windowSize, X_train.shape[-1]),
-	                        activation='relu'))
+	model.add(Conv1D(nb_filters, filter_len,
+	                 input_shape=(windowSize, X_train.shape[-1]),
+	                 activation='relu'))
 	model.add(Dropout(0.2))
-	model.add(Convolution1D(nb_filters, filter_len, activation='relu'))
+	model.add(Conv1D(nb_filters, filter_len, activation='relu'))
 	model.add(Dropout(0.2))
 	model.add(MaxPooling1D(2))
 
@@ -172,6 +175,52 @@ def runCNN1D(inputDrop, flags):
 	return formatOutput(score, time.clock() - start)
 
 def runCNN2D(inputDrop, flags):
-	pass
+	# weights
+	nb_filters = 32
+	# kernel size
+	filter_len = 3
+	# pool size
+	nb_pool = 2
+
+	X_train, Y_train, X_test, Y_test = mfcpp.getSubset(inputDrop, ratioOfTestsInInput)
+	X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[-1], 1))
+	X_test = np.reshape(X_test, (X_test.shape[0], X_test.shape[-1], 1))
+
+	print "X_train", X_train.shape
+	print "Y_train", Y_train.shape
+	print "X_test", X_test.shape
+	print "Y_test", Y_test.shape
+
+	model = Sequential()
+
+	model.add(Conv2D(nb_filters, (filter_len, filter_len),
+					 # treat input as a 2D greyscale image
+	                 input_shape=(windowSize, X_train.shape[-1], 1),
+	                 activation='relu'))
+	model.add(Dropout(0.2))
+	model.add(Conv2D(nb_filters, (filter_len, filter_len), activation='relu'))
+	model.add(Dropout(0.2))
+	model.add(MaxPooling2D(pool_size=(2, 2)))
+
+	model.add(Flatten())
+	model.add(Dense(256, activation='relu'))
+	model.add(Dropout(0.5))
+	model.add(Dense(sinfo.getNbClasses(), activation='softmax'))
+
+	model.compile(loss='categorical_crossentropy',
+	              optimizer='adadelta',
+	              metrics=['accuracy'])
+
+	start = time.clock()
+	# Verbose 0: No output while processing
+	# Verbose 1: Output each batch
+	# Verbose 2: Output each epoch
+	model.fit(X_train, Y_train, batch_size=batch_size, nb_epoch=nb_epoch,
+	          verbose=0, validation_data=(X_test, Y_test))
+	score = [0, 0]
+	if ratioOfTestsInInput > 0:
+		score = model.evaluate(X_test, Y_test, verbose=0)
+	
+	return formatOutput(score, start)
 
 run = runCNN1D

@@ -109,6 +109,7 @@ def collateData(speakerList):
 	y = []
 	for s in speakerList:
 		if s in fileDict:
+			# 3D array
 			data = fileDict[s]
 		elif s in otherData:
 			data = otherData[s]
@@ -117,9 +118,11 @@ def collateData(speakerList):
 			print fileDict.keys()
 			print otherData.keys()
 			assert False
-		for f in data:
-			x.extend(f)
-			y.extend(np.full((len(f)), truthVals[s], dtype='int8'))
+		for fileData in data:
+			# extend y as a 2d array
+			# maps append() to the individual elements
+			x.extend(fileData)
+			y.extend(np.full((len(fileData)), truthVals[s], dtype='int8'))
 	return x, y
 
 # X_train:	input for the training set
