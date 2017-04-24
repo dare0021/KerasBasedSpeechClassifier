@@ -1,3 +1,5 @@
+Not an active project.
+
 # KerasBasedSpeechClassifier
 Using Keras to build a classifier for speech. Not necessarily a speaker identifier
 
